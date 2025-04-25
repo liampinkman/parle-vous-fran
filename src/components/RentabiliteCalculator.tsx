@@ -19,13 +19,23 @@ const RentabiliteCalculator = () => {
   const [loyerMensuel, setLoyerMensuel] = useState<string>("");
   const [chargesAnnuelles, setChargesAnnuelles] = useState<string>("");
   const [tauxImpot, setTauxImpot] = useState<string>("30");
+  
+  // Nouveaux champs pour le crédit
+  const [apport, setApport] = useState<string>("");
+  const [tauxCredit, setTauxCredit] = useState<string>("3.5");
+  const [dureeCredit, setDureeCredit] = useState<string>("20");
+  
   const [resultat, setResultat] = useState<{
     rentabilite: number;
     rentabiliteNette: number;
     cashflowMensuel: number;
     cashflowApresImpot: number;
     rendementApresImpot: number;
+    mensualiteCredit: number;
+    montantEmprunte: number;
+    cashflowNetMensuel: number;
   } | null>(null);
+  
   const { toast } = useToast();
 
   const calculateRentabilite = () => {
@@ -48,24 +58,22 @@ const RentabiliteCalculator = () => {
       return;
     }
 
-    if (!chargesAnnuelles) {
-      // Si charges est vide, on considère que c'est 0
-      setChargesAnnuelles("0");
-    } else if (isNaN(parseFloat(chargesAnnuelles)) || parseFloat(chargesAnnuelles) < 0) {
-      toast({
-        title: "Erreur de saisie",
-        description: "Les charges annuelles doivent être un nombre positif ou zéro.",
-        variant: "destructive",
-      });
-      return;
-    }
-
+    // Calculs de base
     const prix = parseFloat(prixAchat);
     const frais = (prix * parseFloat(fraisNotaire)) / 100;
     const investissementTotal = prix + frais;
     const revenusAnnuels = parseFloat(loyerMensuel) * 12;
     const charges = chargesAnnuelles ? parseFloat(chargesAnnuelles) : 0;
     const tauxImposition = parseFloat(tauxImpot) / 100;
+    
+    // Calculs liés au crédit
+    const apportInitial = apport ? parseFloat(apport) : 0;
+    const montantEmprunte = prix - apportInitial;
+    const tauxMensuel = parseFloat(tauxCredit) / 100 / 12;
+    const nombreMensualites = parseInt(dureeCredit) * 12;
+    
+    // Calcul de la mensualité de crédit (formule de crédit)
+    const mensualiteCredit = montantEmprunte * (tauxMensuel * Math.pow(1 + tauxMensuel, nombreMensualites)) / (Math.pow(1 + tauxMensuel, nombreMensualites) - 1);
     
     // Calcul de la rentabilité brute (hors frais de notaire)
     const rentabilite = (revenusAnnuels / prix) * 100;
@@ -83,6 +91,9 @@ const RentabiliteCalculator = () => {
     // Cash-flow mensuel après impôt
     const cashflowApresImpot = (revenuImposable - impotAnnuel) / 12;
     
+    // Cash-flow net mensuel (après crédit et impôts)
+    const cashflowNetMensuel = cashflowApresImpot - mensualiteCredit;
+    
     // Rendement après impôt
     const rendementApresImpot = ((revenuImposable - impotAnnuel) / investissementTotal) * 100;
 
@@ -91,7 +102,10 @@ const RentabiliteCalculator = () => {
       rentabiliteNette: parseFloat(rentabiliteNette.toFixed(2)),
       cashflowMensuel: parseFloat(cashflowMensuel.toFixed(2)),
       cashflowApresImpot: parseFloat(cashflowApresImpot.toFixed(2)),
-      rendementApresImpot: parseFloat(rendementApresImpot.toFixed(2))
+      rendementApresImpot: parseFloat(rendementApresImpot.toFixed(2)),
+      mensualiteCredit: parseFloat(mensualiteCredit.toFixed(2)),
+      montantEmprunte: parseFloat(montantEmprunte.toFixed(2)),
+      cashflowNetMensuel: parseFloat(cashflowNetMensuel.toFixed(2))
     });
     
     toast({
@@ -105,14 +119,14 @@ const RentabiliteCalculator = () => {
       <div className="bg-blue-50 p-4 rounded-lg mb-6">
         <h3 className="text-sm font-medium mb-2 text-blue-800">Informations sur le calcul de rentabilité en France (2025)</h3>
         <p className="text-sm text-blue-700 mb-2">
-          Ce calculateur prend en compte les facteurs suivants selon la fiscalité française actuelle :
+          Ce calculateur prend en compte tous les aspects de votre investissement :
         </p>
         <ul className="list-disc pl-5 text-sm text-blue-700 space-y-1">
           <li>Frais de notaire entre 7% et 8% pour l'ancien, environ 3% pour le neuf</li>
-          <li>Charges annuelles : taxe foncière, charges de copropriété, assurances, vacance locative, entretien</li>
-          <li>Prélèvement Forfaitaire Unique (PFU) par défaut à 30% ou régime réel d'imposition</li>
-          <li>Calculs de rentabilité brute, nette, et après impôt</li>
-          <li>Estimation du cash-flow mensuel avant et après fiscalité</li>
+          <li>Mensualités de crédit selon votre apport et les conditions d'emprunt</li>
+          <li>Charges annuelles : taxe foncière, charges de copropriété, assurances, etc.</li>
+          <li>Fiscalité : PFU à 30% ou régime réel d'imposition</li>
+          <li>Cash-flow mensuel réel après crédit et impôts</li>
         </ul>
       </div>
 
@@ -125,6 +139,40 @@ const RentabiliteCalculator = () => {
             value={prixAchat}
             onChange={(e) => setPrixAchat(e.target.value)}
             placeholder="200000"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="apport">Apport personnel (€)</Label>
+          <Input
+            id="apport"
+            type="number"
+            value={apport}
+            onChange={(e) => setApport(e.target.value)}
+            placeholder="40000"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="tauxCredit">Taux du crédit (%)</Label>
+          <Input
+            id="tauxCredit"
+            type="number"
+            step="0.1"
+            value={tauxCredit}
+            onChange={(e) => setTauxCredit(e.target.value)}
+            placeholder="3.5"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="dureeCredit">Durée du crédit (années)</Label>
+          <Input
+            id="dureeCredit"
+            type="number"
+            value={dureeCredit}
+            onChange={(e) => setDureeCredit(e.target.value)}
+            placeholder="20"
           />
         </div>
 
@@ -193,6 +241,18 @@ const RentabiliteCalculator = () => {
           </TableHeader>
           <TableBody>
             <TableRow>
+              <TableCell>Montant emprunté</TableCell>
+              <TableCell className="text-right font-semibold">
+                {resultat.montantEmprunte.toLocaleString()} €
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Mensualité de crédit</TableCell>
+              <TableCell className="text-right font-semibold">
+                {resultat.mensualiteCredit.toLocaleString()} €/mois
+              </TableCell>
+            </TableRow>
+            <TableRow>
               <TableCell>Rentabilité brute</TableCell>
               <TableCell className="text-right font-semibold">
                 {resultat.rentabilite}%
@@ -205,7 +265,7 @@ const RentabiliteCalculator = () => {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Cash-flow mensuel avant impôt</TableCell>
+              <TableCell>Cash-flow mensuel avant crédit et impôt</TableCell>
               <TableCell className="text-right font-semibold">
                 {resultat.cashflowMensuel.toLocaleString()} €
               </TableCell>
@@ -214,6 +274,12 @@ const RentabiliteCalculator = () => {
               <TableCell>Cash-flow mensuel après impôt</TableCell>
               <TableCell className="text-right font-semibold">
                 {resultat.cashflowApresImpot.toLocaleString()} €
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Cash-flow net mensuel (après crédit et impôts)</TableCell>
+              <TableCell className={`text-right font-semibold ${resultat.cashflowNetMensuel >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                {resultat.cashflowNetMensuel.toLocaleString()} €
               </TableCell>
             </TableRow>
             <TableRow>
