@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import {
   Table,
   TableBody,
@@ -22,13 +23,45 @@ const RentabiliteCalculator = () => {
     rentabiliteNette: number;
     cashflowMensuel: number;
   } | null>(null);
+  const { toast } = useToast();
 
   const calculateRentabilite = () => {
+    // Validation des entrées
+    if (!prixAchat || isNaN(parseFloat(prixAchat)) || parseFloat(prixAchat) <= 0) {
+      toast({
+        title: "Erreur de saisie",
+        description: "Veuillez saisir un prix d'achat valide.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!loyerMensuel || isNaN(parseFloat(loyerMensuel)) || parseFloat(loyerMensuel) <= 0) {
+      toast({
+        title: "Erreur de saisie",
+        description: "Veuillez saisir un loyer mensuel valide.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!chargesAnnuelles) {
+      // Si charges est vide, on considère que c'est 0
+      setChargesAnnuelles("0");
+    } else if (isNaN(parseFloat(chargesAnnuelles)) || parseFloat(chargesAnnuelles) < 0) {
+      toast({
+        title: "Erreur de saisie",
+        description: "Les charges annuelles doivent être un nombre positif ou zéro.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const prix = parseFloat(prixAchat);
     const frais = (prix * parseFloat(fraisNotaire)) / 100;
     const investissementTotal = prix + frais;
     const revenusAnnuels = parseFloat(loyerMensuel) * 12;
-    const charges = parseFloat(chargesAnnuelles);
+    const charges = chargesAnnuelles ? parseFloat(chargesAnnuelles) : 0;
     
     const rentabilite = (revenusAnnuels / prix) * 100;
     const rentabiliteNette = ((revenusAnnuels - charges) / investissementTotal) * 100;
@@ -38,6 +71,11 @@ const RentabiliteCalculator = () => {
       rentabilite: parseFloat(rentabilite.toFixed(2)),
       rentabiliteNette: parseFloat(rentabiliteNette.toFixed(2)),
       cashflowMensuel: parseFloat(cashflowMensuel.toFixed(2)),
+    });
+    
+    toast({
+      title: "Calcul effectué",
+      description: "La rentabilité a été calculée avec succès.",
     });
   };
 

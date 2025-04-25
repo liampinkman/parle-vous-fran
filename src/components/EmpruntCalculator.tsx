@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 import {
   Table,
   TableBody,
@@ -19,10 +20,33 @@ const EmpruntCalculator = () => {
   const [tauxInteret, setTauxInteret] = useState<string>("3.5");
   const [capaciteEmprunt, setCapaciteEmprunt] = useState<number | null>(null);
   const [mensualite, setMensualite] = useState<number | null>(null);
+  const { toast } = useToast();
 
   const calculateEmprunt = () => {
+    // Validation des entrées
+    if (!revenuMensuel || isNaN(parseFloat(revenuMensuel)) || parseFloat(revenuMensuel) <= 0) {
+      toast({
+        title: "Erreur de saisie",
+        description: "Veuillez saisir un revenu mensuel valide.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!charges) {
+      // Si charges est vide, on considère que c'est 0
+      setCharges("0");
+    } else if (isNaN(parseFloat(charges)) || parseFloat(charges) < 0) {
+      toast({
+        title: "Erreur de saisie",
+        description: "Les charges doivent être un nombre positif ou zéro.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const revenu = parseFloat(revenuMensuel);
-    const chargesValue = parseFloat(charges);
+    const chargesValue = charges ? parseFloat(charges) : 0;
     const tauxMensuel = parseFloat(tauxInteret) / 100 / 12;
     const nbMois = parseInt(duree) * 12;
     
@@ -34,6 +58,11 @@ const EmpruntCalculator = () => {
     
     setCapaciteEmprunt(Math.round(capacite));
     setMensualite(Math.round(capaciteMensuelle));
+    
+    toast({
+      title: "Calcul effectué",
+      description: "Votre capacité d'emprunt a été calculée avec succès.",
+    });
   };
 
   return (
