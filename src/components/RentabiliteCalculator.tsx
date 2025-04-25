@@ -18,10 +18,13 @@ const RentabiliteCalculator = () => {
   const [fraisNotaire, setFraisNotaire] = useState<string>("8");
   const [loyerMensuel, setLoyerMensuel] = useState<string>("");
   const [chargesAnnuelles, setChargesAnnuelles] = useState<string>("");
+  const [tauxImpot, setTauxImpot] = useState<string>("30");
   const [resultat, setResultat] = useState<{
     rentabilite: number;
     rentabiliteNette: number;
     cashflowMensuel: number;
+    cashflowApresImpot: number;
+    rendementApresImpot: number;
   } | null>(null);
   const { toast } = useToast();
 
@@ -62,15 +65,33 @@ const RentabiliteCalculator = () => {
     const investissementTotal = prix + frais;
     const revenusAnnuels = parseFloat(loyerMensuel) * 12;
     const charges = chargesAnnuelles ? parseFloat(chargesAnnuelles) : 0;
+    const tauxImposition = parseFloat(tauxImpot) / 100;
     
+    // Calcul de la rentabilité brute (hors frais de notaire)
     const rentabilite = (revenusAnnuels / prix) * 100;
+    
+    // Calcul de la rentabilité nette (avec frais de notaire et charges)
     const rentabiliteNette = ((revenusAnnuels - charges) / investissementTotal) * 100;
+    
+    // Cash-flow mensuel avant impôt
     const cashflowMensuel = (revenusAnnuels - charges) / 12;
+    
+    // Calcul de l'impôt (PFU ou régime réel simplifié)
+    const revenuImposable = revenusAnnuels - charges;
+    const impotAnnuel = revenuImposable * tauxImposition;
+    
+    // Cash-flow mensuel après impôt
+    const cashflowApresImpot = (revenuImposable - impotAnnuel) / 12;
+    
+    // Rendement après impôt
+    const rendementApresImpot = ((revenuImposable - impotAnnuel) / investissementTotal) * 100;
 
     setResultat({
       rentabilite: parseFloat(rentabilite.toFixed(2)),
       rentabiliteNette: parseFloat(rentabiliteNette.toFixed(2)),
       cashflowMensuel: parseFloat(cashflowMensuel.toFixed(2)),
+      cashflowApresImpot: parseFloat(cashflowApresImpot.toFixed(2)),
+      rendementApresImpot: parseFloat(rendementApresImpot.toFixed(2))
     });
     
     toast({
@@ -81,6 +102,20 @@ const RentabiliteCalculator = () => {
 
   return (
     <div className="space-y-6 p-4">
+      <div className="bg-blue-50 p-4 rounded-lg mb-6">
+        <h3 className="text-sm font-medium mb-2 text-blue-800">Informations sur le calcul de rentabilité en France (2025)</h3>
+        <p className="text-sm text-blue-700 mb-2">
+          Ce calculateur prend en compte les facteurs suivants selon la fiscalité française actuelle :
+        </p>
+        <ul className="list-disc pl-5 text-sm text-blue-700 space-y-1">
+          <li>Frais de notaire entre 7% et 8% pour l'ancien, environ 3% pour le neuf</li>
+          <li>Charges annuelles : taxe foncière, charges de copropriété, assurances, vacance locative, entretien</li>
+          <li>Prélèvement Forfaitaire Unique (PFU) par défaut à 30% ou régime réel d'imposition</li>
+          <li>Calculs de rentabilité brute, nette, et après impôt</li>
+          <li>Estimation du cash-flow mensuel avant et après fiscalité</li>
+        </ul>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="prixAchat">Prix d'achat (€)</Label>
@@ -106,7 +141,7 @@ const RentabiliteCalculator = () => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="loyerMensuel">Loyer mensuel estimé (€)</Label>
+          <Label htmlFor="loyerMensuel">Loyer mensuel hors charges (€)</Label>
           <Input
             id="loyerMensuel"
             type="number"
@@ -125,6 +160,20 @@ const RentabiliteCalculator = () => {
             onChange={(e) => setChargesAnnuelles(e.target.value)}
             placeholder="2000"
           />
+          <p className="text-xs text-gray-500">Taxe foncière, charges de copropriété, assurances, entretien estimé, vacance locative...</p>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="tauxImpot">Taux d'imposition (%)</Label>
+          <Input
+            id="tauxImpot"
+            type="number"
+            step="0.1"
+            value={tauxImpot}
+            onChange={(e) => setTauxImpot(e.target.value)}
+            placeholder="30"
+          />
+          <p className="text-xs text-gray-500">PFU à 30% ou taux marginal d'imposition pour le régime réel</p>
         </div>
       </div>
 
@@ -150,15 +199,27 @@ const RentabiliteCalculator = () => {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Rentabilité nette</TableCell>
+              <TableCell>Rentabilité nette avant impôt</TableCell>
               <TableCell className="text-right font-semibold">
                 {resultat.rentabiliteNette}%
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Cash-flow mensuel</TableCell>
+              <TableCell>Cash-flow mensuel avant impôt</TableCell>
               <TableCell className="text-right font-semibold">
                 {resultat.cashflowMensuel.toLocaleString()} €
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Cash-flow mensuel après impôt</TableCell>
+              <TableCell className="text-right font-semibold">
+                {resultat.cashflowApresImpot.toLocaleString()} €
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Rentabilité nette après impôt</TableCell>
+              <TableCell className="text-right font-semibold">
+                {resultat.rendementApresImpot}%
               </TableCell>
             </TableRow>
           </TableBody>

@@ -20,6 +20,7 @@ const EmpruntCalculator = () => {
   const [tauxInteret, setTauxInteret] = useState<string>("3.5");
   const [capaciteEmprunt, setCapaciteEmprunt] = useState<number | null>(null);
   const [mensualite, setMensualite] = useState<number | null>(null);
+  const [tauxEndettement, setTauxEndettement] = useState<number | null>(null);
   const { toast } = useToast();
 
   const calculateEmprunt = () => {
@@ -56,8 +57,12 @@ const EmpruntCalculator = () => {
     // Calcul de la capacité d'emprunt (formule de crédit)
     const capacite = capaciteMensuelle * (1 - Math.pow(1 + tauxMensuel, -nbMois)) / tauxMensuel;
     
+    // Calcul du taux d'endettement
+    const tauxEndettementValue = (capaciteMensuelle / revenu) * 100;
+    
     setCapaciteEmprunt(Math.round(capacite));
     setMensualite(Math.round(capaciteMensuelle));
+    setTauxEndettement(Math.round(tauxEndettementValue * 100) / 100);
     
     toast({
       title: "Calcul effectué",
@@ -67,9 +72,23 @@ const EmpruntCalculator = () => {
 
   return (
     <div className="space-y-6 p-4">
+      <div className="bg-blue-50 p-4 rounded-lg mb-6">
+        <h3 className="text-sm font-medium mb-2 text-blue-800">Informations sur le calcul de capacité d'emprunt en France (2025)</h3>
+        <p className="text-sm text-blue-700 mb-2">
+          Ce calculateur prend en compte les critères suivants selon les normes françaises actuelles :
+        </p>
+        <ul className="list-disc pl-5 text-sm text-blue-700 space-y-1">
+          <li>Taux d'endettement maximal de 35% des revenus nets (norme HCSF 2021)</li>
+          <li>Durée maximale d'emprunt généralement limitée à 25 ans</li>
+          <li>Revenus nets mensuels après impôt</li>
+          <li>Charges mensuelles incluant les crédits en cours</li>
+          <li>Taux d'intérêt moyen en 2025 (à ajuster selon les offres bancaires actuelles)</li>
+        </ul>
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
-          <Label htmlFor="revenu">Revenu mensuel net (€)</Label>
+          <Label htmlFor="revenu">Revenu mensuel net après impôt (€)</Label>
           <Input
             id="revenu"
             type="number"
@@ -80,7 +99,7 @@ const EmpruntCalculator = () => {
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="charges">Charges mensuelles (€)</Label>
+          <Label htmlFor="charges">Charges mensuelles (crédits en cours) (€)</Label>
           <Input
             id="charges"
             type="number"
@@ -102,7 +121,7 @@ const EmpruntCalculator = () => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="taux">Taux d'intérêt (%)</Label>
+          <Label htmlFor="taux">Taux d'intérêt (% annuel)</Label>
           <Input
             id="taux"
             type="number"
@@ -141,6 +160,14 @@ const EmpruntCalculator = () => {
                 {mensualite.toLocaleString()} €
               </TableCell>
             </TableRow>
+            {tauxEndettement !== null && (
+              <TableRow>
+                <TableCell>Taux d'endettement</TableCell>
+                <TableCell className="text-right font-semibold">
+                  {tauxEndettement}%
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       )}
