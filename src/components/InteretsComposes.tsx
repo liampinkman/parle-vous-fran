@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -23,7 +22,6 @@ const InteretsComposes = () => {
   const { toast } = useToast();
 
   const calculerInteretsComposes = () => {
-    // Validation des entrées
     if (!montantInitial || isNaN(parseFloat(montantInitial)) || parseFloat(montantInitial) < 0) {
       toast({
         title: "Erreur de saisie",
@@ -73,11 +71,9 @@ const InteretsComposes = () => {
     let versementsCumules = 0;
     let interetsGeneres = 0;
 
-    for (let annee = 1; annee <= Math.min(annees, 40); annee++) {
-      // Limitation à 40 années pour ne pas surcharger l'interface
+    for (let annee = 1; annee <= Math.max(parseInt(duree), 30); annee++) {
       let capitalDebutAnnee = capitalActuel;
       
-      // Calcul des intérêts et des versements sur l'année
       for (let mois = 1; mois <= 12; mois++) {
         let interetsMois = capitalActuel * tauxMensuel;
         capitalActuel += interetsMois + versements;
@@ -85,14 +81,16 @@ const InteretsComposes = () => {
         interetsGeneres += interetsMois;
       }
       
-      resultatsCalculs.push({
-        annee,
-        capitalDebutAnnee,
-        capitalFinAnnee: capitalActuel,
-        versementsCumules,
-        interetsGeneres,
-        gainTotal: capitalActuel - capital - versementsCumules
-      });
+      if (annee <= parseInt(duree) || annee === 25 || annee === 30) {
+        resultatsCalculs.push({
+          annee,
+          capitalDebutAnnee,
+          capitalFinAnnee: capitalActuel,
+          versementsCumules,
+          interetsGeneres,
+          gainTotal: capitalActuel - capital - versementsCumules
+        });
+      }
     }
 
     setResultats(resultatsCalculs);
@@ -101,6 +99,11 @@ const InteretsComposes = () => {
       title: "Calcul effectué",
       description: "Vos intérêts composés ont été calculés avec succès.",
     });
+  };
+
+  const getAnneesCles = (resultats: any[]) => {
+    const anneesImportantes = [1, 5, 10, 15, 20, 25, 30];
+    return resultats.filter(r => anneesImportantes.includes(r.annee) || r.annee === parseInt(duree));
   };
 
   const formatMontant = (montant: number) => {
