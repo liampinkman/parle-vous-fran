@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,14 +13,14 @@ import {
 } from "@/components/ui/table";
 
 const RentabiliteCalculator = () => {
-  const [prixAchat, setPrixAchat] = useState<string>("");
+  const [prixAchat, setPrixAchat] = useState<string>("200000");
   const [fraisNotaire, setFraisNotaire] = useState<string>("8");
-  const [loyerMensuel, setLoyerMensuel] = useState<string>("");
-  const [chargesAnnuelles, setChargesAnnuelles] = useState<string>("");
+  const [loyerMensuel, setLoyerMensuel] = useState<string>("1000");
+  const [chargesAnnuelles, setChargesAnnuelles] = useState<string>("2000");
   const [tauxImpot, setTauxImpot] = useState<string>("30");
   
   // Nouveaux champs pour le crédit
-  const [apport, setApport] = useState<string>("");
+  const [apport, setApport] = useState<string>("40000");
   const [tauxCredit, setTauxCredit] = useState<string>("3.5");
   const [dureeCredit, setDureeCredit] = useState<string>("20");
   

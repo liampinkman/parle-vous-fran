@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/table";
 
 const EmpruntCalculator = () => {
-  const [revenuMensuel, setRevenuMensuel] = useState<string>("");
-  const [charges, setCharges] = useState<string>("");
+  const [revenuMensuel, setRevenuMensuel] = useState<string>("3000");
+  const [charges, setCharges] = useState<string>("500");
   const [duree, setDuree] = useState<string>("20");
   const [tauxInteret, setTauxInteret] = useState<string>("3.5");
   const [capaciteEmprunt, setCapaciteEmprunt] = useState<number | null>(null);

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,8 +14,8 @@ import {
 } from "@/components/ui/table";
 
 const InteretsComposes = () => {
-  const [montantInitial, setMontantInitial] = useState<string>("");
-  const [versementsMensuels, setVersementsMensuels] = useState<string>("");
+  const [montantInitial, setMontantInitial] = useState<string>("10000");
+  const [versementsMensuels, setVersementsMensuels] = useState<string>("200");
   const [tauxAnnuel, setTauxAnnuel] = useState<string>("7");
   const [duree, setDuree] = useState<string>("20");
   const [resultats, setResultats] = useState<any[]>([]);
