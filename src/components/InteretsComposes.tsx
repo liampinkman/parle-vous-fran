@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -101,21 +102,21 @@ const InteretsComposes = () => {
     });
   };
 
-  const getAnneesCles = (resultats: any[]) => {
-    const anneesImportantes = [1, 5, 10, 15, 20, 25, 30];
-    return resultats.filter(r => anneesImportantes.includes(r.annee) || r.annee === parseInt(duree));
-  };
-
   const formatMontant = (montant: number) => {
     return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(montant);
   };
   
+  // Merged the two getAnneesCles functions into one with the combined functionality
   const getAnneesCles = (resultats: any[]) => {
     if (resultats.length <= 5) return resultats;
     
-    // Retourner les années 1, 5, 10, 15... et la dernière année
+    // Années importantes incluant les années 25 et 30 comme demandé
     const anneesImportantes = [1, 5, 10, 15, 20, 25, 30, 35, 40];
-    return resultats.filter(r => anneesImportantes.includes(r.annee) || r.annee === resultats.length);
+    return resultats.filter(r => 
+      anneesImportantes.includes(r.annee) || 
+      r.annee === parseInt(duree) || 
+      r.annee === resultats.length
+    );
   };
 
   return (
