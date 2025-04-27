@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -192,8 +193,14 @@ const RentabiliteCalculator = memo(() => {
               </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell>Cash-flow mensuel après crédit</TableCell>
+              <TableCell>Cash-flow mensuel après impôt</TableCell>
               <TableCell className="text-right font-semibold">
+                {formatMontant(result.cashflowApresImpot)} €
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell>Cash-flow net mensuel (après crédit et impôts)</TableCell>
+              <TableCell className={`text-right font-semibold ${result.cashflowNetMensuel >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                 {formatMontant(result.cashflowNetMensuel)} €
               </TableCell>
             </TableRow>
