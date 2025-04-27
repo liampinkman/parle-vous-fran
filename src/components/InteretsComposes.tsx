@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
 import { Calculator, ChartLine, TrendingUp } from "lucide-react";
+import { useInteretsComposes } from "@/hooks/useInteretsComposes";
 import {
   Table,
   TableBody,
@@ -12,111 +12,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { memo } from "react";
 
-const InteretsComposes = () => {
-  const [montantInitial, setMontantInitial] = useState<string>("10000");
-  const [versementsMensuels, setVersementsMensuels] = useState<string>("200");
-  const [tauxAnnuel, setTauxAnnuel] = useState<string>("7");
-  const [duree, setDuree] = useState<string>("20");
-  const [resultats, setResultats] = useState<any[]>([]);
-  const { toast } = useToast();
-
-  const calculerInteretsComposes = () => {
-    if (!montantInitial || isNaN(parseFloat(montantInitial)) || parseFloat(montantInitial) < 0) {
-      toast({
-        title: "Erreur de saisie",
-        description: "Veuillez saisir un montant initial valide.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!versementsMensuels) {
-      setVersementsMensuels("0");
-    } else if (isNaN(parseFloat(versementsMensuels)) || parseFloat(versementsMensuels) < 0) {
-      toast({
-        title: "Erreur de saisie",
-        description: "Les versements mensuels doivent être positifs ou zéro.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!tauxAnnuel || isNaN(parseFloat(tauxAnnuel)) || parseFloat(tauxAnnuel) < 0) {
-      toast({
-        title: "Erreur de saisie", 
-        description: "Veuillez saisir un taux annuel valide.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!duree || isNaN(parseInt(duree)) || parseInt(duree) <= 0) {
-      toast({
-        title: "Erreur de saisie",
-        description: "Veuillez saisir une durée valide.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const capital = parseFloat(montantInitial);
-    const versements = parseFloat(versementsMensuels || "0");
-    const taux = parseFloat(tauxAnnuel) / 100;
-    const annees = parseInt(duree);
-    const tauxMensuel = taux / 12;
-
-    let resultatsCalculs = [];
-    let capitalActuel = capital;
-    let versementsCumules = 0;
-    let interetsGeneres = 0;
-
-    for (let annee = 1; annee <= Math.max(parseInt(duree), 30); annee++) {
-      let capitalDebutAnnee = capitalActuel;
-      
-      for (let mois = 1; mois <= 12; mois++) {
-        let interetsMois = capitalActuel * tauxMensuel;
-        capitalActuel += interetsMois + versements;
-        versementsCumules += versements;
-        interetsGeneres += interetsMois;
-      }
-      
-      if (annee <= parseInt(duree) || annee === 25 || annee === 30) {
-        resultatsCalculs.push({
-          annee,
-          capitalDebutAnnee,
-          capitalFinAnnee: capitalActuel,
-          versementsCumules,
-          interetsGeneres,
-          gainTotal: capitalActuel - capital - versementsCumules
-        });
-      }
-    }
-
-    setResultats(resultatsCalculs);
-    
-    toast({
-      title: "Calcul effectué",
-      description: "Vos intérêts composés ont été calculés avec succès.",
-    });
-  };
-
-  const formatMontant = (montant: number) => {
-    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(montant);
-  };
-  
-  // Merged the two getAnneesCles functions into one with the combined functionality
-  const getAnneesCles = (resultats: any[]) => {
-    if (resultats.length <= 5) return resultats;
-    
-    // Années importantes incluant les années 25 et 30 comme demandé
-    const anneesImportantes = [1, 5, 10, 15, 20, 25, 30, 35, 40];
-    return resultats.filter(r => 
-      anneesImportantes.includes(r.annee) || 
-      r.annee === parseInt(duree) || 
-      r.annee === resultats.length
-    );
-  };
+const InteretsComposes = memo(() => {
+  const {
+    montantInitial,
+    setMontantInitial,
+    versementsMensuels,
+    setVersementsMensuels,
+    tauxAnnuel,
+    setTauxAnnuel,
+    duree,
+    setDuree,
+    resultats,
+    calculerInteretsComposes,
+    getAnneesClesCalcul,
+    formatMontantEuro
+  } = useInteretsComposes();
 
   return (
     <div className="space-y-6 p-4">
@@ -207,17 +119,17 @@ const InteretsComposes = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {getAnneesCles(resultats).map((resultat) => (
+                {getAnneesClesCalcul().map((resultat) => (
                   <TableRow key={resultat.annee}>
                     <TableCell>{resultat.annee}</TableCell>
                     <TableCell className="text-right font-semibold">
-                      {formatMontant(resultat.capitalFinAnnee)}
+                      {formatMontantEuro(resultat.capitalFinAnnee)}
                     </TableCell>
                     <TableCell className="text-right">
-                      {formatMontant(resultat.versementsCumules)}
+                      {formatMontantEuro(resultat.versementsCumules)}
                     </TableCell>
                     <TableCell className="text-right result-positive">
-                      {formatMontant(resultat.gainTotal)}
+                      {formatMontantEuro(resultat.gainTotal)}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -231,12 +143,12 @@ const InteretsComposes = () => {
               Résultat après {duree} ans
             </h4>
             <p className="text-green-700 mt-2">
-              Avec un investissement initial de {formatMontant(parseFloat(montantInitial))} 
-              {parseFloat(versementsMensuels) > 0 ? ` et ${formatMontant(parseFloat(versementsMensuels))} versés chaque mois` : ''}, 
-              votre capital atteindra <strong>{formatMontant(resultats[resultats.length - 1].capitalFinAnnee)}</strong>.
+              Avec un investissement initial de {formatMontantEuro(parseFloat(montantInitial))} 
+              {parseFloat(versementsMensuels) > 0 ? ` et ${formatMontantEuro(parseFloat(versementsMensuels))} versés chaque mois` : ''}, 
+              votre capital atteindra <strong>{formatMontantEuro(resultats[resultats.length - 1].capitalFinAnnee)}</strong>.
             </p>
             <p className="text-green-700 mt-1">
-              Soit un gain total de <strong className="text-green-800">{formatMontant(resultats[resultats.length - 1].gainTotal)}</strong> 
+              Soit un gain total de <strong className="text-green-800">{formatMontantEuro(resultats[resultats.length - 1].gainTotal)}</strong> 
               ({(resultats[resultats.length - 1].gainTotal / (parseFloat(montantInitial) + resultats[resultats.length - 1].versementsCumules) * 100).toFixed(2)}% de votre investissement).
             </p>
           </div>
@@ -244,6 +156,8 @@ const InteretsComposes = () => {
       )}
     </div>
   );
-};
+});
+
+InteretsComposes.displayName = "InteretsComposes";
 
 export default InteretsComposes;

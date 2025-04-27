@@ -1,9 +1,9 @@
 
-import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
+import { useEmpruntCalculator } from "@/hooks/useEmpruntCalculator";
+import { formatMontant } from "@/utils/financialCalculators";
 import {
   Table,
   TableBody,
@@ -12,63 +12,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { memo } from "react";
 
-const EmpruntCalculator = () => {
-  const [revenuMensuel, setRevenuMensuel] = useState<string>("3000");
-  const [charges, setCharges] = useState<string>("500");
-  const [duree, setDuree] = useState<string>("20");
-  const [tauxInteret, setTauxInteret] = useState<string>("3.5");
-  const [capaciteEmprunt, setCapaciteEmprunt] = useState<number | null>(null);
-  const [mensualite, setMensualite] = useState<number | null>(null);
-  const [tauxEndettement, setTauxEndettement] = useState<number | null>(null);
-  const { toast } = useToast();
-
-  const calculateEmprunt = () => {
-    // Validation des entrées
-    if (!revenuMensuel || isNaN(parseFloat(revenuMensuel)) || parseFloat(revenuMensuel) <= 0) {
-      toast({
-        title: "Erreur de saisie",
-        description: "Veuillez saisir un revenu mensuel valide.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!charges) {
-      // Si charges est vide, on considère que c'est 0
-      setCharges("0");
-    } else if (isNaN(parseFloat(charges)) || parseFloat(charges) < 0) {
-      toast({
-        title: "Erreur de saisie",
-        description: "Les charges doivent être un nombre positif ou zéro.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const revenu = parseFloat(revenuMensuel);
-    const chargesValue = charges ? parseFloat(charges) : 0;
-    const tauxMensuel = parseFloat(tauxInteret) / 100 / 12;
-    const nbMois = parseInt(duree) * 12;
-    
-    // Capacité d'endettement maximum (35% des revenus)
-    const capaciteMensuelle = (revenu - chargesValue) * 0.35;
-    
-    // Calcul de la capacité d'emprunt (formule de crédit)
-    const capacite = capaciteMensuelle * (1 - Math.pow(1 + tauxMensuel, -nbMois)) / tauxMensuel;
-    
-    // Calcul du taux d'endettement
-    const tauxEndettementValue = (capaciteMensuelle / revenu) * 100;
-    
-    setCapaciteEmprunt(Math.round(capacite));
-    setMensualite(Math.round(capaciteMensuelle));
-    setTauxEndettement(Math.round(tauxEndettementValue * 100) / 100);
-    
-    toast({
-      title: "Calcul effectué",
-      description: "Votre capacité d'emprunt a été calculée avec succès.",
-    });
-  };
+const EmpruntCalculator = memo(() => {
+  const {
+    revenuMensuel,
+    setRevenuMensuel,
+    charges,
+    setCharges,
+    duree,
+    setDuree,
+    tauxInteret,
+    setTauxInteret,
+    result,
+    calculateEmprunt
+  } = useEmpruntCalculator();
 
   return (
     <div className="space-y-6 p-4">
@@ -139,7 +97,7 @@ const EmpruntCalculator = () => {
         </Button>
       </div>
 
-      {capaciteEmprunt !== null && mensualite !== null && (
+      {result.capaciteEmprunt !== null && result.mensualite !== null && (
         <Table>
           <TableHeader>
             <TableRow>
@@ -151,20 +109,20 @@ const EmpruntCalculator = () => {
             <TableRow>
               <TableCell>Capacité d'emprunt maximale</TableCell>
               <TableCell className="text-right font-semibold">
-                {capaciteEmprunt.toLocaleString()} €
+                {formatMontant(result.capaciteEmprunt)} €
               </TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Mensualité maximale</TableCell>
               <TableCell className="text-right font-semibold">
-                {mensualite.toLocaleString()} €
+                {formatMontant(result.mensualite)} €
               </TableCell>
             </TableRow>
-            {tauxEndettement !== null && (
+            {result.tauxEndettement !== null && (
               <TableRow>
                 <TableCell>Taux d'endettement</TableCell>
                 <TableCell className="text-right font-semibold">
-                  {tauxEndettement}%
+                  {result.tauxEndettement}%
                 </TableCell>
               </TableRow>
             )}
@@ -173,6 +131,8 @@ const EmpruntCalculator = () => {
       )}
     </div>
   );
-};
+});
+
+EmpruntCalculator.displayName = "EmpruntCalculator";
 
 export default EmpruntCalculator;
