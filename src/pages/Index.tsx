@@ -1,4 +1,3 @@
-
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import EmpruntCalculator from "@/components/EmpruntCalculator";
@@ -9,6 +8,9 @@ import AdSpace from "@/components/AdSpace";
 import { Calculator, CircleDollarSign, TrendingUp, HelpCircle } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAdRefresh } from "@/hooks/useAdRefresh";
+import { useEmpruntCalculator } from "@/hooks/useEmpruntCalculator";
+import { useRentabiliteCalculator } from "@/hooks/useRentabiliteCalculator";
+import { useInteretsComposes } from "@/hooks/useInteretsComposes";
 
 const Index = () => {
   const isMobile = useIsMobile();
