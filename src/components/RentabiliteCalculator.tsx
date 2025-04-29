@@ -14,27 +14,51 @@ import {
 } from "@/components/ui/table";
 import { memo } from "react";
 
-const RentabiliteCalculator = memo(() => {
+interface RentabiliteCalculatorProps {
+  prixAchat?: string;
+  setPrixAchat?: (value: string) => void;
+  fraisNotaire?: string;
+  setFraisNotaire?: (value: string) => void;
+  loyerMensuel?: string;
+  setLoyerMensuel?: (value: string) => void;
+  chargesAnnuelles?: string;
+  setChargesAnnuelles?: (value: string) => void;
+  tauxImpot?: string;
+  setTauxImpot?: (value: string) => void;
+  apport?: string;
+  setApport?: (value: string) => void;
+  tauxCredit?: string;
+  setTauxCredit?: (value: string) => void;
+  dureeCredit?: string;
+  setDureeCredit?: (value: string) => void;
+  result?: any;
+  calculateRentabilite?: () => void;
+}
+
+const RentabiliteCalculator = memo((props: RentabiliteCalculatorProps) => {
+  // Utiliser soit les props fournies, soit le hook local
+  const hookValues = useRentabiliteCalculator();
+  
   const {
-    prixAchat,
-    setPrixAchat,
-    fraisNotaire,
-    setFraisNotaire,
-    loyerMensuel,
-    setLoyerMensuel,
-    chargesAnnuelles,
-    setChargesAnnuelles,
-    tauxImpot,
-    setTauxImpot,
-    apport,
-    setApport,
-    tauxCredit,
-    setTauxCredit,
-    dureeCredit,
-    setDureeCredit,
-    result,
-    calculateRentabilite
-  } = useRentabiliteCalculator();
+    prixAchat = props.prixAchat || hookValues.prixAchat,
+    setPrixAchat = props.setPrixAchat || hookValues.setPrixAchat,
+    fraisNotaire = props.fraisNotaire || hookValues.fraisNotaire,
+    setFraisNotaire = props.setFraisNotaire || hookValues.setFraisNotaire,
+    loyerMensuel = props.loyerMensuel || hookValues.loyerMensuel,
+    setLoyerMensuel = props.setLoyerMensuel || hookValues.setLoyerMensuel,
+    chargesAnnuelles = props.chargesAnnuelles || hookValues.chargesAnnuelles,
+    setChargesAnnuelles = props.setChargesAnnuelles || hookValues.setChargesAnnuelles,
+    tauxImpot = props.tauxImpot || hookValues.tauxImpot,
+    setTauxImpot = props.setTauxImpot || hookValues.setTauxImpot,
+    apport = props.apport || hookValues.apport,
+    setApport = props.setApport || hookValues.setApport,
+    tauxCredit = props.tauxCredit || hookValues.tauxCredit,
+    setTauxCredit = props.setTauxCredit || hookValues.setTauxCredit,
+    dureeCredit = props.dureeCredit || hookValues.dureeCredit,
+    setDureeCredit = props.setDureeCredit || hookValues.setDureeCredit,
+    result = props.result || hookValues.result,
+    calculateRentabilite = props.calculateRentabilite || hookValues.calculateRentabilite
+  } = props.calculateRentabilite ? props : hookValues;
   
   return (
     <div className="space-y-6 p-4">

@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -14,19 +13,39 @@ import {
 } from "@/components/ui/table";
 import { memo } from "react";
 
-const EmpruntCalculator = memo(() => {
+interface EmpruntCalculatorProps {
+  revenuMensuel?: string;
+  setRevenuMensuel?: (value: string) => void;
+  charges?: string;
+  setCharges?: (value: string) => void;
+  duree?: string;
+  setDuree?: (value: string) => void;
+  tauxInteret?: string;
+  setTauxInteret?: (value: string) => void;
+  result?: {
+    capaciteEmprunt: number | null;
+    mensualite: number | null;
+    tauxEndettement: number | null;
+  };
+  calculateEmprunt?: () => void;
+}
+
+const EmpruntCalculator = memo((props: EmpruntCalculatorProps) => {
+  // Utiliser soit les props fournies, soit le hook local
+  const hookValues = useEmpruntCalculator();
+  
   const {
-    revenuMensuel,
-    setRevenuMensuel,
-    charges,
-    setCharges,
-    duree,
-    setDuree,
-    tauxInteret,
-    setTauxInteret,
-    result,
-    calculateEmprunt
-  } = useEmpruntCalculator();
+    revenuMensuel = props.revenuMensuel || hookValues.revenuMensuel,
+    setRevenuMensuel = props.setRevenuMensuel || hookValues.setRevenuMensuel,
+    charges = props.charges || hookValues.charges,
+    setCharges = props.setCharges || hookValues.setCharges,
+    duree = props.duree || hookValues.duree,
+    setDuree = props.setDuree || hookValues.setDuree,
+    tauxInteret = props.tauxInteret || hookValues.tauxInteret,
+    setTauxInteret = props.setTauxInteret || hookValues.setTauxInteret,
+    result = props.result || hookValues.result,
+    calculateEmprunt = props.calculateEmprunt || hookValues.calculateEmprunt
+  } = props.calculateEmprunt ? props : hookValues;
 
   return (
     <div className="space-y-6 p-4">
@@ -90,7 +109,7 @@ const EmpruntCalculator = memo(() => {
           />
         </div>
       </div>
-
+      
       <div className="flex justify-center">
         <Button onClick={calculateEmprunt} className="w-full md:w-auto">
           Calculer

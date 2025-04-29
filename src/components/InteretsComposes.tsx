@@ -14,21 +14,39 @@ import {
 } from "@/components/ui/table";
 import { memo } from "react";
 
-const InteretsComposes = memo(() => {
+interface InteretsComposesProps {
+  montantInitial?: string;
+  setMontantInitial?: (value: string) => void;
+  versementsMensuels?: string;
+  setVersementsMensuels?: (value: string) => void;
+  tauxAnnuel?: string;
+  setTauxAnnuel?: (value: string) => void;
+  duree?: string;
+  setDuree?: (value: string) => void;
+  resultats?: Array<any>;
+  calculerInteretsComposes?: () => void;
+  getAnneesClesCalcul?: () => Array<any>;
+  formatMontantEuro?: (montant: number) => string;
+}
+
+const InteretsComposes = memo((props: InteretsComposesProps) => {
+  // Utiliser soit les props fournies, soit le hook local
+  const hookValues = useInteretsComposes();
+  
   const {
-    montantInitial,
-    setMontantInitial,
-    versementsMensuels,
-    setVersementsMensuels,
-    tauxAnnuel,
-    setTauxAnnuel,
-    duree,
-    setDuree,
-    resultats,
-    calculerInteretsComposes,
-    getAnneesClesCalcul,
-    formatMontantEuro
-  } = useInteretsComposes();
+    montantInitial = props.montantInitial || hookValues.montantInitial,
+    setMontantInitial = props.setMontantInitial || hookValues.setMontantInitial,
+    versementsMensuels = props.versementsMensuels || hookValues.versementsMensuels,
+    setVersementsMensuels = props.setVersementsMensuels || hookValues.setVersementsMensuels,
+    tauxAnnuel = props.tauxAnnuel || hookValues.tauxAnnuel,
+    setTauxAnnuel = props.setTauxAnnuel || hookValues.setTauxAnnuel,
+    duree = props.duree || hookValues.duree,
+    setDuree = props.setDuree || hookValues.setDuree,
+    resultats = props.resultats || hookValues.resultats,
+    calculerInteretsComposes = props.calculerInteretsComposes || hookValues.calculerInteretsComposes,
+    getAnneesClesCalcul = props.getAnneesClesCalcul || hookValues.getAnneesClesCalcul,
+    formatMontantEuro = props.formatMontantEuro || hookValues.formatMontantEuro
+  } = props.calculerInteretsComposes ? props : hookValues;
 
   return (
     <div className="space-y-6 p-4">

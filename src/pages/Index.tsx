@@ -4,12 +4,21 @@ import { Card, CardContent } from "@/components/ui/card";
 import EmpruntCalculator from "@/components/EmpruntCalculator";
 import RentabiliteCalculator from "@/components/RentabiliteCalculator";
 import InteretsComposes from "@/components/InteretsComposes";
+import Faq from "@/components/Faq";
 import AdSpace from "@/components/AdSpace";
-import { Calculator, CircleDollarSign, TrendingUp } from "lucide-react";
+import { Calculator, CircleDollarSign, TrendingUp, HelpCircle } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAdRefresh } from "@/hooks/useAdRefresh";
 
 const Index = () => {
   const isMobile = useIsMobile();
+  const { refreshKey, refreshAds } = useAdRefresh();
+  
+  // Fonction pour gérer les calculs avec rafraîchissement des publicités
+  const handleCalculWithAdRefresh = (calculateFn: () => void) => {
+    calculateFn();
+    refreshAds();
+  };
   
   return (
     <div className="min-h-screen bg-secondary p-3 md:p-6">
@@ -32,7 +41,7 @@ const Index = () => {
             <Card className="card-financial">
               <CardContent className="p-3 pt-5 md:pt-6 md:p-6">
                 <Tabs defaultValue="emprunt" className="w-full">
-                  <TabsList className="w-full grid grid-cols-3 mb-2">
+                  <TabsList className="w-full grid grid-cols-4 mb-2">
                     <TabsTrigger value="emprunt" className="flex items-center gap-1">
                       <Calculator size={16} className="hidden md:block" />
                       <span>Capacité d'Emprunt</span>
@@ -44,6 +53,10 @@ const Index = () => {
                     <TabsTrigger value="interets" className="flex items-center gap-1">
                       <TrendingUp size={16} className="hidden md:block" />
                       <span>Intérêts Composés</span>
+                    </TabsTrigger>
+                    <TabsTrigger value="faq" className="flex items-center gap-1">
+                      <HelpCircle size={16} className="hidden md:block" />
+                      <span>FAQ</span>
                     </TabsTrigger>
                   </TabsList>
                   
@@ -58,7 +71,7 @@ const Index = () => {
                         </p>
                       </div>
                     )}
-                    <EmpruntCalculator />
+                    <EmpruntCalculatorWithRefresh refreshAds={refreshAds} />
                   </TabsContent>
                   
                   <TabsContent value="rentabilite">
@@ -73,7 +86,7 @@ const Index = () => {
                         </p>
                       </div>
                     )}
-                    <RentabiliteCalculator />
+                    <RentabiliteCalculatorWithRefresh refreshAds={refreshAds} />
                   </TabsContent>
                   
                   <TabsContent value="interets">
@@ -88,19 +101,32 @@ const Index = () => {
                         </p>
                       </div>
                     )}
-                    <InteretsComposes />
+                    <InteretsComposesWithRefresh refreshAds={refreshAds} />
+                  </TabsContent>
+                  
+                  <TabsContent value="faq">
+                    {!isMobile && (
+                      <div className="mb-4">
+                        <h2 className="text-xl font-semibold mb-2">Questions fréquentes sur l'investissement</h2>
+                        <p className="text-gray-600">
+                          Consultez nos réponses aux questions les plus fréquemment posées sur l'investissement immobilier et financier en France.
+                          Ces informations sont régulièrement mises à jour pour refléter les dernières tendances et réglementations du marché français.
+                        </p>
+                      </div>
+                    )}
+                    <Faq />
                   </TabsContent>
                 </Tabs>
               </CardContent>
             </Card>
 
-            {!isMobile && <AdSpace position="bottom" />}
+            {!isMobile && <AdSpace position="bottom" refreshKey={refreshKey} />}
           </div>
 
           {!isMobile && (
             <div className="space-y-4 md:space-y-6">
-              <AdSpace position="sidebar" />
-              <AdSpace position="sidebar" />
+              <AdSpace position="sidebar" refreshKey={refreshKey} />
+              <AdSpace position="sidebar" refreshKey={refreshKey} />
             </div>
           )}
         </div>
@@ -134,6 +160,94 @@ const Index = () => {
         )}
       </div>
     </div>
+  );
+};
+
+// Composants avec rafraîchissement de publicités
+const EmpruntCalculatorWithRefresh = ({ refreshAds }: { refreshAds: () => void }) => {
+  const { revenuMensuel, setRevenuMensuel, charges, setCharges, duree, setDuree, 
+          tauxInteret, setTauxInteret, result, calculateEmprunt } = useEmpruntCalculator();
+
+  const handleCalculate = () => {
+    calculateEmprunt();
+    refreshAds();
+  };
+
+  return (
+    <EmpruntCalculator
+      revenuMensuel={revenuMensuel}
+      setRevenuMensuel={setRevenuMensuel}
+      charges={charges}
+      setCharges={setCharges}
+      duree={duree}
+      setDuree={setDuree}
+      tauxInteret={tauxInteret}
+      setTauxInteret={setTauxInteret}
+      result={result}
+      calculateEmprunt={handleCalculate}
+    />
+  );
+};
+
+const RentabiliteCalculatorWithRefresh = ({ refreshAds }: { refreshAds: () => void }) => {
+  const { prixAchat, setPrixAchat, fraisNotaire, setFraisNotaire, loyerMensuel, setLoyerMensuel,
+          chargesAnnuelles, setChargesAnnuelles, tauxImpot, setTauxImpot, apport, setApport,
+          tauxCredit, setTauxCredit, dureeCredit, setDureeCredit, result, calculateRentabilite } = useRentabiliteCalculator();
+
+  const handleCalculate = () => {
+    calculateRentabilite();
+    refreshAds();
+  };
+
+  return (
+    <RentabiliteCalculator
+      prixAchat={prixAchat}
+      setPrixAchat={setPrixAchat}
+      fraisNotaire={fraisNotaire}
+      setFraisNotaire={setFraisNotaire}
+      loyerMensuel={loyerMensuel}
+      setLoyerMensuel={setLoyerMensuel}
+      chargesAnnuelles={chargesAnnuelles}
+      setChargesAnnuelles={setChargesAnnuelles}
+      tauxImpot={tauxImpot}
+      setTauxImpot={setTauxImpot}
+      apport={apport}
+      setApport={setApport}
+      tauxCredit={tauxCredit}
+      setTauxCredit={setTauxCredit}
+      dureeCredit={dureeCredit}
+      setDureeCredit={setDureeCredit}
+      result={result}
+      calculateRentabilite={handleCalculate}
+    />
+  );
+};
+
+const InteretsComposesWithRefresh = ({ refreshAds }: { refreshAds: () => void }) => {
+  const { montantInitial, setMontantInitial, versementsMensuels, setVersementsMensuels,
+          tauxAnnuel, setTauxAnnuel, duree, setDuree, resultats, calculerInteretsComposes,
+          getAnneesClesCalcul, formatMontantEuro } = useInteretsComposes();
+
+  const handleCalculate = () => {
+    calculerInteretsComposes();
+    refreshAds();
+  };
+
+  return (
+    <InteretsComposes
+      montantInitial={montantInitial}
+      setMontantInitial={setMontantInitial}
+      versementsMensuels={versementsMensuels}
+      setVersementsMensuels={setVersementsMensuels}
+      tauxAnnuel={tauxAnnuel}
+      setTauxAnnuel={setTauxAnnuel}
+      duree={duree}
+      setDuree={setDuree}
+      resultats={resultats}
+      calculerInteretsComposes={handleCalculate}
+      getAnneesClesCalcul={getAnneesClesCalcul}
+      formatMontantEuro={formatMontantEuro}
+    />
   );
 };
 
