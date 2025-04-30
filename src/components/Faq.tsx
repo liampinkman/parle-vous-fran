@@ -26,18 +26,22 @@ const Faq = memo(() => {
 
       <div className="mb-4">
         <Tabs defaultValue="all" onValueChange={setActiveTab} className="w-full">
-          <TabsList className="w-full grid grid-cols-3 mb-4">
-            <TabsTrigger value="all" className="flex items-center justify-center gap-1 text-xs sm:text-sm px-1 sm:px-2">
-              <BookOpen size={14} className="shrink-0" />
-              <span className="truncate">Toutes</span>
+          <TabsList className="grid grid-cols-2 gap-1 mb-4">
+            <TabsTrigger value="all" className="flex items-center justify-center gap-1">
+              <BookOpen size={16} />
+              <span>Toutes</span>
             </TabsTrigger>
-            <TabsTrigger value="immobilier" className="flex items-center justify-center gap-1 text-xs sm:text-sm px-1 sm:px-2">
-              <Home size={14} className="shrink-0" />
-              <span className="truncate">Immobilier</span>
+            <TabsTrigger value="immobilier" className="flex items-center justify-center gap-1">
+              <Home size={16} />
+              <span>Immobilier</span>
             </TabsTrigger>
-            <TabsTrigger value="finance" className="flex items-center justify-center gap-1 text-xs sm:text-sm px-1 sm:px-2">
-              <TrendingUp size={14} className="shrink-0" />
-              <span className="truncate">Finance</span>
+            <TabsTrigger value="finance" className="flex items-center justify-center gap-1">
+              <TrendingUp size={16} />
+              <span>Finance</span>
+            </TabsTrigger>
+            <TabsTrigger value="new" className="flex items-center justify-center gap-1">
+              <Book size={16} />
+              <span>Nouveautés</span>
             </TabsTrigger>
           </TabsList>
           
@@ -51,6 +55,12 @@ const Faq = memo(() => {
           
           <TabsContent value="finance">
             <FaqQuestions showCategory="finance" />
+          </TabsContent>
+
+          <TabsContent value="new">
+            <div className="py-2">
+              <p className="text-gray-600">Restez informé des dernières évolutions du marché et des opportunités d'investissement en 2025.</p>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
