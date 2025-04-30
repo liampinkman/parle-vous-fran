@@ -26,20 +26,20 @@ const Faq = memo(() => {
 
       <div className="mb-4">
         <Tabs defaultValue="all" onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-2 gap-1 mb-4">
-            <TabsTrigger value="all" className="flex items-center justify-center gap-1">
+          <TabsList className="grid sm:grid-cols-4 grid-cols-2 gap-1 mb-4">
+            <TabsTrigger value="all" className="flex items-center justify-center gap-1.5">
               <BookOpen size={16} />
               <span>Toutes</span>
             </TabsTrigger>
-            <TabsTrigger value="immobilier" className="flex items-center justify-center gap-1">
+            <TabsTrigger value="immobilier" className="flex items-center justify-center gap-1.5">
               <Home size={16} />
               <span>Immobilier</span>
             </TabsTrigger>
-            <TabsTrigger value="finance" className="flex items-center justify-center gap-1">
+            <TabsTrigger value="finance" className="flex items-center justify-center gap-1.5">
               <TrendingUp size={16} />
               <span>Finance</span>
             </TabsTrigger>
-            <TabsTrigger value="new" className="flex items-center justify-center gap-1">
+            <TabsTrigger value="new" className="flex items-center justify-center gap-1.5">
               <Book size={16} />
               <span>Nouveautés</span>
             </TabsTrigger>
