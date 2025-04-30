@@ -51,21 +51,21 @@ const Index = () => {
               <CardContent className="p-3 pt-5 md:pt-6 md:p-6">
                 <Tabs defaultValue="emprunt" value={activeTab} onValueChange={handleTabChange} className="w-full">
                   <TabsList className="w-full grid grid-cols-4 mb-2">
-                    <TabsTrigger value="emprunt" className="flex items-center gap-1">
-                      <Calculator size={16} className="hidden md:block" />
-                      <span>Capacité d'Emprunt</span>
+                    <TabsTrigger value="emprunt" className="flex items-center justify-center gap-1 text-xs sm:text-sm px-1 sm:px-2">
+                      <Calculator size={14} className="shrink-0" />
+                      <span className="truncate">Emprunt</span>
                     </TabsTrigger>
-                    <TabsTrigger value="rentabilite" className="flex items-center gap-1">
-                      <CircleDollarSign size={16} className="hidden md:block" />
-                      <span>Rentabilité Locative</span>
+                    <TabsTrigger value="rentabilite" className="flex items-center justify-center gap-1 text-xs sm:text-sm px-1 sm:px-2">
+                      <CircleDollarSign size={14} className="shrink-0" />
+                      <span className="truncate">Rentabilité</span>
                     </TabsTrigger>
-                    <TabsTrigger value="interets" className="flex items-center gap-1">
-                      <TrendingUp size={16} className="hidden md:block" />
-                      <span>Intérêts Composés</span>
+                    <TabsTrigger value="interets" className="flex items-center justify-center gap-1 text-xs sm:text-sm px-1 sm:px-2">
+                      <TrendingUp size={14} className="shrink-0" />
+                      <span className="truncate">Intérêts</span>
                     </TabsTrigger>
-                    <TabsTrigger value="faq" className="flex items-center gap-1">
-                      <HelpCircle size={16} className="hidden md:block" />
-                      <span>FAQ</span>
+                    <TabsTrigger value="faq" className="flex items-center justify-center gap-1 text-xs sm:text-sm px-1 sm:px-2">
+                      <HelpCircle size={14} className="shrink-0" />
+                      <span className="truncate">FAQ</span>
                     </TabsTrigger>
                   </TabsList>
                   
