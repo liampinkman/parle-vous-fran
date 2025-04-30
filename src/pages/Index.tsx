@@ -1,3 +1,4 @@
+
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import EmpruntCalculator from "@/components/EmpruntCalculator";
@@ -8,22 +9,28 @@ import AdSpace from "@/components/AdSpace";
 import { Calculator, CircleDollarSign, TrendingUp, HelpCircle } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAdRefresh } from "@/hooks/useAdRefresh";
+// Import des hooks nécessaires
 import { useEmpruntCalculator } from "@/hooks/useEmpruntCalculator";
 import { useRentabiliteCalculator } from "@/hooks/useRentabiliteCalculator";
 import { useInteretsComposes } from "@/hooks/useInteretsComposes";
+import { useState, useCallback, memo, lazy, Suspense } from "react";
+
+// Utilisation du lazy loading pour les contenus moins prioritaires
+const SiteAdvice = lazy(() => import("@/components/SiteAdvice"));
 
 const Index = () => {
   const isMobile = useIsMobile();
-  const { refreshKey, refreshAds } = useAdRefresh();
+  const { refreshKey, refreshAds, shouldDisplayAd } = useAdRefresh();
+  const [activeTab, setActiveTab] = useState("emprunt");
   
-  // Fonction pour gérer les calculs avec rafraîchissement des publicités
-  const handleCalculWithAdRefresh = (calculateFn: () => void) => {
-    calculateFn();
-    refreshAds();
-  };
+  // Fonction pour gérer les changements d'onglet
+  const handleTabChange = useCallback((value: string) => {
+    setActiveTab(value);
+    // Ne pas rafraîchir les publicités lors des changements d'onglet pour éviter trop de requêtes
+  }, []);
   
   return (
-    <div className="min-h-screen bg-secondary p-3 md:p-6">
+    <div className="min-h-screen bg-secondary p-3 pb-6 md:p-6">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-4 md:gap-6">
           <div>
@@ -42,7 +49,7 @@ const Index = () => {
             
             <Card className="card-financial">
               <CardContent className="p-3 pt-5 md:pt-6 md:p-6">
-                <Tabs defaultValue="emprunt" className="w-full">
+                <Tabs defaultValue="emprunt" value={activeTab} onValueChange={handleTabChange} className="w-full">
                   <TabsList className="w-full grid grid-cols-4 mb-2">
                     <TabsTrigger value="emprunt" className="flex items-center gap-1">
                       <Calculator size={16} className="hidden md:block" />
@@ -62,6 +69,7 @@ const Index = () => {
                     </TabsTrigger>
                   </TabsList>
                   
+                  {/* Utiliser des memo pour éviter les re-rendus inutiles */}
                   <TabsContent value="emprunt">
                     {!isMobile && (
                       <div className="mb-4">
@@ -122,58 +130,63 @@ const Index = () => {
               </CardContent>
             </Card>
 
-            {!isMobile && <AdSpace position="bottom" refreshKey={refreshKey} />}
+            {/* Publicité en bas uniquement si l'utilisateur n'est pas sur mobile ou si shouldDisplayAd retourne true */}
+            {(!isMobile || shouldDisplayAd("bottom")) && <AdSpace position="bottom" refreshKey={refreshKey} />}
           </div>
 
+          {/* Sidebar avec publicités uniquement si l'utilisateur n'est pas sur mobile ou si shouldDisplayAd retourne true */}
           {!isMobile && (
             <div className="space-y-4 md:space-y-6">
               <AdSpace position="sidebar" refreshKey={refreshKey} />
-              <AdSpace position="sidebar" refreshKey={refreshKey} />
+              {shouldDisplayAd("sidebar") && <AdSpace position="sidebar" refreshKey={refreshKey} />}
             </div>
           )}
         </div>
 
+        {/* Contenu informatif en bas de page - chargé paresseusement */}
         {!isMobile && (
-          <div className="mt-6 md:mt-8 prose max-w-none">
-            <h2 className="text-xl md:text-2xl font-semibold mb-4 text-primary">Conseils pour votre investissement immobilier en France (2025)</h2>
-            <div className="grid md:grid-cols-2 gap-4 md:gap-6">
-              <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-100">
-                <h3 className="text-lg md:text-xl font-semibold mb-3 text-primary">Avant d'emprunter</h3>
-                <ul className="list-disc pl-5 text-gray-700">
-                  <li>Évaluez votre capacité d'épargne mensuelle</li>
-                  <li>Constituez un apport personnel d'au moins 10-15%</li>
-                  <li>Vérifiez votre taux d'endettement actuel (max 35%)</li>
-                  <li>Comparez les offres de plusieurs banques et courtiers</li>
-                  <li>Pensez à l'assurance emprunteur (délégation possible)</li>
-                </ul>
-              </div>
-              <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-100">
-                <h3 className="text-lg md:text-xl font-semibold mb-3 text-primary">Pour la rentabilité locative</h3>
-                <ul className="list-disc pl-5 text-gray-700">
-                  <li>Étudiez le marché locatif local et sa dynamique</li>
-                  <li>Anticipez les charges réelles (copropriété, taxe foncière)</li>
-                  <li>Considérez le régime fiscal adapté (LMNP, SCI, etc.)</li>
-                  <li>Évaluez le potentiel de plus-value à long terme</li>
-                  <li>Prévoyez une réserve pour travaux et vacance locative</li>
-                </ul>
+          <Suspense fallback={<div className="mt-6 h-40 bg-gray-100 animate-pulse rounded-lg"></div>}>
+            <div className="mt-6 md:mt-8 prose max-w-none">
+              <h2 className="text-xl md:text-2xl font-semibold mb-4 text-primary">Conseils pour votre investissement immobilier en France (2025)</h2>
+              <div className="grid md:grid-cols-2 gap-4 md:gap-6">
+                <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-100">
+                  <h3 className="text-lg md:text-xl font-semibold mb-3 text-primary">Avant d'emprunter</h3>
+                  <ul className="list-disc pl-5 text-gray-700">
+                    <li>Évaluez votre capacité d'épargne mensuelle</li>
+                    <li>Constituez un apport personnel d'au moins 10-15%</li>
+                    <li>Vérifiez votre taux d'endettement actuel (max 35%)</li>
+                    <li>Comparez les offres de plusieurs banques et courtiers</li>
+                    <li>Pensez à l'assurance emprunteur (délégation possible)</li>
+                  </ul>
+                </div>
+                <div className="bg-white p-4 md:p-6 rounded-lg shadow-sm border border-gray-100">
+                  <h3 className="text-lg md:text-xl font-semibold mb-3 text-primary">Pour la rentabilité locative</h3>
+                  <ul className="list-disc pl-5 text-gray-700">
+                    <li>Étudiez le marché locatif local et sa dynamique</li>
+                    <li>Anticipez les charges réelles (copropriété, taxe foncière)</li>
+                    <li>Considérez le régime fiscal adapté (LMNP, SCI, etc.)</li>
+                    <li>Évaluez le potentiel de plus-value à long terme</li>
+                    <li>Prévoyez une réserve pour travaux et vacance locative</li>
+                  </ul>
+                </div>
               </div>
             </div>
-          </div>
+          </Suspense>
         )}
       </div>
     </div>
   );
 };
 
-// Composants avec rafraîchissement de publicités
-const EmpruntCalculatorWithRefresh = ({ refreshAds }: { refreshAds: () => void }) => {
+// Composants optimisés avec memo pour éviter les re-rendus inutiles
+const EmpruntCalculatorWithRefresh = memo(({ refreshAds }: { refreshAds: () => void }) => {
   const { revenuMensuel, setRevenuMensuel, charges, setCharges, duree, setDuree, 
           tauxInteret, setTauxInteret, result, calculateEmprunt } = useEmpruntCalculator();
 
-  const handleCalculate = () => {
+  const handleCalculate = useCallback(() => {
     calculateEmprunt();
     refreshAds();
-  };
+  }, [calculateEmprunt, refreshAds]);
 
   return (
     <EmpruntCalculator
@@ -189,17 +202,17 @@ const EmpruntCalculatorWithRefresh = ({ refreshAds }: { refreshAds: () => void }
       calculateEmprunt={handleCalculate}
     />
   );
-};
+});
 
-const RentabiliteCalculatorWithRefresh = ({ refreshAds }: { refreshAds: () => void }) => {
+const RentabiliteCalculatorWithRefresh = memo(({ refreshAds }: { refreshAds: () => void }) => {
   const { prixAchat, setPrixAchat, fraisNotaire, setFraisNotaire, loyerMensuel, setLoyerMensuel,
           chargesAnnuelles, setChargesAnnuelles, tauxImpot, setTauxImpot, apport, setApport,
           tauxCredit, setTauxCredit, dureeCredit, setDureeCredit, result, calculateRentabilite } = useRentabiliteCalculator();
 
-  const handleCalculate = () => {
+  const handleCalculate = useCallback(() => {
     calculateRentabilite();
     refreshAds();
-  };
+  }, [calculateRentabilite, refreshAds]);
 
   return (
     <RentabiliteCalculator
@@ -223,17 +236,17 @@ const RentabiliteCalculatorWithRefresh = ({ refreshAds }: { refreshAds: () => vo
       calculateRentabilite={handleCalculate}
     />
   );
-};
+});
 
-const InteretsComposesWithRefresh = ({ refreshAds }: { refreshAds: () => void }) => {
+const InteretsComposesWithRefresh = memo(({ refreshAds }: { refreshAds: () => void }) => {
   const { montantInitial, setMontantInitial, versementsMensuels, setVersementsMensuels,
           tauxAnnuel, setTauxAnnuel, duree, setDuree, resultats, calculerInteretsComposes,
           getAnneesClesCalcul, formatMontantEuro } = useInteretsComposes();
 
-  const handleCalculate = () => {
+  const handleCalculate = useCallback(() => {
     calculerInteretsComposes();
     refreshAds();
-  };
+  }, [calculerInteretsComposes, refreshAds]);
 
   return (
     <InteretsComposes
@@ -251,6 +264,11 @@ const InteretsComposesWithRefresh = ({ refreshAds }: { refreshAds: () => void })
       formatMontantEuro={formatMontantEuro}
     />
   );
-};
+});
+
+// Ajout des displayNames pour aider au debugging
+EmpruntCalculatorWithRefresh.displayName = "EmpruntCalculatorWithRefresh";
+RentabiliteCalculatorWithRefresh.displayName = "RentabiliteCalculatorWithRefresh";
+InteretsComposesWithRefresh.displayName = "InteretsComposesWithRefresh";
 
 export default Index;

@@ -1,10 +1,34 @@
 
 /**
- * Utilitaires pour les calculs financiers
+ * Utilitaires pour les calculs financiers optimisés
  */
 
-// Calcul de la capacité d'emprunt
-export const calculateEmpruntCapacity = (
+// Memoization pour les calculs fréquents
+const memoize = <T extends (...args: any[]) => any>(fn: T): T => {
+  const cache = new Map();
+  
+  return ((...args: Parameters<T>): ReturnType<T> => {
+    const key = JSON.stringify(args);
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
+    
+    const result = fn(...args);
+    cache.set(key, result);
+    
+    // Limiter la taille du cache pour éviter les fuites mémoire
+    if (cache.size > 100) {
+      // Supprimer la première entrée (la plus ancienne)
+      const firstKey = cache.keys().next().value;
+      cache.delete(firstKey);
+    }
+    
+    return result;
+  }) as T;
+};
+
+// Calcul de la capacité d'emprunt optimisé
+export const calculateEmpruntCapacity = memoize((
   revenuMensuel: number,
   charges: number,
   tauxInteret: number,
@@ -20,7 +44,16 @@ export const calculateEmpruntCapacity = (
   // Calcul de la capacité d'emprunt (formule de crédit)
   const tauxMensuel = tauxInteret / 100 / 12;
   const nbMois = duree * 12;
-  const capacite = capaciteMensuelle * (1 - Math.pow(1 + tauxMensuel, -nbMois)) / tauxMensuel;
+  
+  // Optimisation de la formule pour éviter les erreurs de précision flottante
+  let capacite: number;
+  
+  if (tauxMensuel <= 0) {
+    // Si le taux est de 0%, c'est un simple calcul linéaire
+    capacite = capaciteMensuelle * nbMois;
+  } else {
+    capacite = capaciteMensuelle * (1 - Math.pow(1 + tauxMensuel, -nbMois)) / tauxMensuel;
+  }
   
   // Calcul du taux d'endettement
   const tauxEndettementValue = (capaciteMensuelle / revenuMensuel) * 100;
@@ -30,10 +63,10 @@ export const calculateEmpruntCapacity = (
     mensualite: Math.round(capaciteMensuelle),
     tauxEndettement: Math.round(tauxEndettementValue * 100) / 100
   };
-};
+});
 
-// Calcul de la rentabilité locative
-export const calculateRentabilite = (
+// Calcul de la rentabilité locative optimisé
+export const calculateRentabilite = memoize((
   prixAchat: number,
   fraisNotaire: number,
   loyerMensuel: number,
@@ -62,7 +95,17 @@ export const calculateRentabilite = (
   const nombreMensualites = dureeCredit * 12;
   
   // Calcul de la mensualité de crédit (formule de crédit)
-  const mensualiteCredit = montantEmprunte * (tauxMensuel * Math.pow(1 + tauxMensuel, nombreMensualites)) / (Math.pow(1 + tauxMensuel, nombreMensualites) - 1);
+  let mensualiteCredit: number;
+  
+  if (montantEmprunte <= 0) {
+    // Pas d'emprunt
+    mensualiteCredit = 0;
+  } else if (tauxMensuel <= 0) {
+    // Taux à 0%
+    mensualiteCredit = montantEmprunte / nombreMensualites;
+  } else {
+    mensualiteCredit = montantEmprunte * (tauxMensuel * Math.pow(1 + tauxMensuel, nombreMensualites)) / (Math.pow(1 + tauxMensuel, nombreMensualites) - 1);
+  }
   
   // Rentabilité brute (hors frais de notaire)
   const rentabilite = (revenusAnnuels / prixAchat) * 100;
@@ -75,7 +118,7 @@ export const calculateRentabilite = (
   
   // Calcul de l'impôt (PFU ou régime réel simplifié)
   const revenuImposable = revenusAnnuels - chargesAnnuelles;
-  const impotAnnuel = revenuImposable * tauxImposition;
+  const impotAnnuel = Math.max(0, revenuImposable * tauxImposition);
   
   // Cash-flow mensuel après impôt
   const cashflowApresImpot = (revenuImposable - impotAnnuel) / 12;
@@ -96,10 +139,10 @@ export const calculateRentabilite = (
     montantEmprunte: parseFloat(montantEmprunte.toFixed(2)),
     cashflowNetMensuel: parseFloat(cashflowNetMensuel.toFixed(2))
   };
-};
+});
 
-// Calcul des intérêts composés
-export const calculateInteretsComposes = (
+// Calcul des intérêts composés optimisé
+export const calculateInteretsComposes = memoize((
   capital: number,
   versements: number,
   taux: number,
@@ -117,8 +160,20 @@ export const calculateInteretsComposes = (
   let capitalActuel = capital;
   let versementsCumules = 0;
   let interetsGeneres = 0;
-
-  for (let annee = 1; annee <= Math.max(annees, 30); annee++) {
+  
+  // Optimisation : ne calcule que pour les années clés au lieu de toutes les années
+  const anneesAConstruire = new Set([...Array.from({length: Math.min(annees, 10)}, (_, i) => i + 1)]);
+  
+  // Ajouter quelques années de référence
+  if (annees > 10) {
+    [15, 20, 25, 30, annees].forEach(a => {
+      if (a <= annees) anneesAConstruire.add(a);
+    });
+  }
+  
+  const anneesTriees = Array.from(anneesAConstruire).sort((a, b) => a - b);
+  
+  for (let annee = 1; annee <= Math.max(...anneesTriees); annee++) {
     const capitalDebutAnnee = capitalActuel;
     
     for (let mois = 1; mois <= 12; mois++) {
@@ -128,7 +183,7 @@ export const calculateInteretsComposes = (
       interetsGeneres += interetsMois;
     }
     
-    if (annee <= annees || annee === 25 || annee === 30) {
+    if (anneesTriees.includes(annee)) {
       resultatsCalculs.push({
         annee,
         capitalDebutAnnee,
@@ -141,7 +196,7 @@ export const calculateInteretsComposes = (
   }
 
   return resultatsCalculs;
-};
+});
 
 // Formattage des montants en euros
 export const formatMontant = (montant: number): string => {
@@ -155,13 +210,16 @@ export const formatMontant = (montant: number): string => {
 
 // Récupération des années clés pour l'affichage des résultats
 export const getAnneesCles = (resultats: any[], duree: number): any[] => {
-  if (resultats.length <= 5) return resultats;
+  if (!resultats || resultats.length <= 5) return resultats || [];
   
   // Années importantes incluant les années 25 et 30
   const anneesImportantes = [1, 5, 10, 15, 20, 25, 30, 35, 40];
-  return resultats.filter(r => 
+  const resultatsFiltered = resultats.filter(r => 
     anneesImportantes.includes(r.annee) || 
     r.annee === duree || 
     r.annee === resultats.length
   );
+  
+  // Si le filtrage a tout supprimé, retourner au moins quelques résultats
+  return resultatsFiltered.length ? resultatsFiltered : resultats.slice(0, 5);
 };
