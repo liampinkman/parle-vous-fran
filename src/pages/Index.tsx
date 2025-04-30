@@ -57,11 +57,11 @@ const Index = () => {
                     </TabsTrigger>
                     <TabsTrigger value="rentabilite" className="flex items-center justify-center gap-1.5">
                       <CircleDollarSign size={16} className="shrink-0" />
-                      <span>Rentabilité</span>
+                      <span>Rentabilité locative</span>
                     </TabsTrigger>
                     <TabsTrigger value="interets" className="flex items-center justify-center gap-1.5">
                       <TrendingUp size={16} className="shrink-0" />
-                      <span>Intérêts</span>
+                      <span>Intérêts composés</span>
                     </TabsTrigger>
                     <TabsTrigger value="faq" className="flex items-center justify-center gap-1.5">
                       <HelpCircle size={16} className="shrink-0" />
