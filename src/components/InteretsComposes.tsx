@@ -28,6 +28,7 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import AdSpace from "@/components/AdSpace";
 
 interface InteretsComposesProps {
   montantInitial?: string;
@@ -175,14 +176,46 @@ const InteretsComposes = memo((props: InteretsComposesProps) => {
 
       {resultats.length > 0 && (
         <>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="results-header">Année</TableHead>
+                  <TableHead className="results-header text-right">Capital</TableHead>
+                  <TableHead className="results-header text-right">Versements cumulés</TableHead>
+                  <TableHead className="results-header text-right">Plus-value</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {getAnneesClesCalcul().map((resultat) => (
+                  <TableRow key={resultat.annee}>
+                    <TableCell>{resultat.annee}</TableCell>
+                    <TableCell className="text-right font-semibold">
+                      {formatMontantEuro(resultat.capitalFinAnnee)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {formatMontantEuro(resultat.versementsCumules)}
+                    </TableCell>
+                    <TableCell className="text-right result-positive">
+                      {formatMontantEuro(resultat.gainTotal)}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Publicité entre le tableau et le graphique */}
+          <AdSpace position="bottom" />
+
           {/* Graphique d'évolution du capital */}
-          <div className="bg-white rounded-lg border p-4 h-80">
+          <div className="bg-white rounded-lg border p-4 h-[360px] md:h-96">
             <h4 className="text-sm font-medium mb-4 text-primary flex items-center gap-2">
               <ChartLine size={18} />
               Évolution de votre capital sur {duree} ans
             </h4>
             <ChartContainer
-              className="h-64"
+              className="h-[280px] md:h-80"
               config={chartConfig}
             >
               <LineChart data={chartData}>
@@ -230,35 +263,6 @@ const InteretsComposes = memo((props: InteretsComposesProps) => {
                 />
               </LineChart>
             </ChartContainer>
-          </div>
-
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="results-header">Année</TableHead>
-                  <TableHead className="results-header text-right">Capital</TableHead>
-                  <TableHead className="results-header text-right">Versements cumulés</TableHead>
-                  <TableHead className="results-header text-right">Plus-value</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {getAnneesClesCalcul().map((resultat) => (
-                  <TableRow key={resultat.annee}>
-                    <TableCell>{resultat.annee}</TableCell>
-                    <TableCell className="text-right font-semibold">
-                      {formatMontantEuro(resultat.capitalFinAnnee)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {formatMontantEuro(resultat.versementsCumules)}
-                    </TableCell>
-                    <TableCell className="text-right result-positive">
-                      {formatMontantEuro(resultat.gainTotal)}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
           </div>
 
           <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
