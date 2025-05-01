@@ -29,6 +29,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import AdSpace from "@/components/AdSpace";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface InteretsComposesProps {
   montantInitial?: string;
@@ -176,92 +177,105 @@ const InteretsComposes = memo((props: InteretsComposesProps) => {
 
       {resultats.length > 0 && (
         <>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="results-header">Année</TableHead>
-                  <TableHead className="results-header text-right">Capital</TableHead>
-                  <TableHead className="results-header text-right">Versements cumulés</TableHead>
-                  <TableHead className="results-header text-right">Plus-value</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {getAnneesClesCalcul().map((resultat) => (
-                  <TableRow key={resultat.annee}>
-                    <TableCell>{resultat.annee}</TableCell>
-                    <TableCell className="text-right font-semibold">
-                      {formatMontantEuro(resultat.capitalFinAnnee)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      {formatMontantEuro(resultat.versementsCumules)}
-                    </TableCell>
-                    <TableCell className="text-right result-positive">
-                      {formatMontantEuro(resultat.gainTotal)}
-                    </TableCell>
+          {/* Tableau de résultats avec ScrollArea pour éviter le scrolling horizontal */}
+          <ScrollArea className="w-full rounded-md border">
+            <div className="w-full min-w-[600px] md:min-w-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="results-header w-[80px]">Année</TableHead>
+                    <TableHead className="results-header text-right">Capital</TableHead>
+                    <TableHead className="results-header text-right">Versements cumulés</TableHead>
+                    <TableHead className="results-header text-right">Plus-value</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {getAnneesClesCalcul().map((resultat) => (
+                    <TableRow key={resultat.annee}>
+                      <TableCell>{resultat.annee}</TableCell>
+                      <TableCell className="text-right font-semibold">
+                        {formatMontantEuro(resultat.capitalFinAnnee)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        {formatMontantEuro(resultat.versementsCumules)}
+                      </TableCell>
+                      <TableCell className="text-right result-positive">
+                        {formatMontantEuro(resultat.gainTotal)}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </ScrollArea>
 
           {/* Publicité entre le tableau et le graphique */}
           <AdSpace position="bottom" />
 
-          {/* Graphique d'évolution du capital */}
-          <div className="bg-white rounded-lg border p-4 h-[360px] md:h-96">
+          {/* Graphique d'évolution du capital avec meilleure responsivité */}
+          <div className="bg-white rounded-lg border p-4 h-auto">
             <h4 className="text-sm font-medium mb-4 text-primary flex items-center gap-2">
               <ChartLine size={18} />
               Évolution de votre capital sur {duree} ans
             </h4>
             <ChartContainer
-              className="h-[280px] md:h-80"
+              className="h-[280px] md:h-80 overflow-visible"
               config={chartConfig}
             >
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-                <XAxis 
-                  dataKey="annee" 
-                  name="Année"
-                  tickFormatter={(value) => `A${value}`}
-                />
-                <YAxis 
-                  tickFormatter={(value) => 
-                    value >= 1000000 
-                      ? `${(value / 1000000).toFixed(0)}M€` 
-                      : value >= 1000 
-                        ? `${(value / 1000).toFixed(0)}k€` 
-                        : `${value}€`
-                  }
-                />
-                <Tooltip content={<CustomTooltip formatMontant={formatMontantEuro} />} />
-                <Legend />
-                <Line
-                  name="Capital total"
-                  type="monotone"
-                  dataKey="capital"
-                  stroke="var(--color-capital)"
-                  strokeWidth={2}
-                  dot={{ r: 3 }}
-                  activeDot={{ r: 5 }}
-                />
-                <Line
-                  name="Versements cumulés"
-                  type="monotone"
-                  dataKey="versements"
-                  stroke="var(--color-versements)"
-                  strokeWidth={2}
-                  dot={{ r: 2 }}
-                />
-                <Line
-                  name="Intérêts générés"
-                  type="monotone"
-                  dataKey="interets"
-                  stroke="var(--color-interets)"
-                  strokeWidth={2}
-                  dot={{ r: 2 }}
-                />
-              </LineChart>
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
+                  <XAxis 
+                    dataKey="annee" 
+                    name="Année"
+                    tickFormatter={(value) => `A${value}`}
+                    interval={"preserveStartEnd"}
+                    tick={{ fontSize: 10 }}
+                  />
+                  <YAxis 
+                    tickFormatter={(value) => 
+                      value >= 1000000 
+                        ? `${(value / 1000000).toFixed(0)}M€` 
+                        : value >= 1000 
+                          ? `${(value / 1000).toFixed(0)}k€` 
+                          : `${value}€`
+                    }
+                    tick={{ fontSize: 10 }}
+                    width={40}
+                  />
+                  <Tooltip content={<CustomTooltip formatMontant={formatMontantEuro} />} />
+                  <Legend 
+                    wrapperStyle={{ fontSize: '10px' }}
+                    iconSize={8}
+                    verticalAlign="bottom"
+                  />
+                  <Line
+                    name="Capital total"
+                    type="monotone"
+                    dataKey="capital"
+                    stroke="var(--color-capital)"
+                    strokeWidth={2}
+                    dot={{ r: 2 }}
+                    activeDot={{ r: 4 }}
+                  />
+                  <Line
+                    name="Versements cumulés"
+                    type="monotone"
+                    dataKey="versements"
+                    stroke="var(--color-versements)"
+                    strokeWidth={2}
+                    dot={{ r: 1 }}
+                  />
+                  <Line
+                    name="Intérêts générés"
+                    type="monotone"
+                    dataKey="interets"
+                    stroke="var(--color-interets)"
+                    strokeWidth={2}
+                    dot={{ r: 1 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
             </ChartContainer>
           </div>
 
