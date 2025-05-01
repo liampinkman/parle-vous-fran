@@ -177,37 +177,35 @@ const InteretsComposes = memo((props: InteretsComposesProps) => {
 
       {resultats.length > 0 && (
         <>
-          {/* Tableau de résultats avec ScrollArea pour éviter le scrolling horizontal */}
-          <ScrollArea className="w-full rounded-md border">
-            <div className="w-full min-w-[600px] md:min-w-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="results-header w-[80px]">Année</TableHead>
-                    <TableHead className="results-header text-right">Capital</TableHead>
-                    <TableHead className="results-header text-right">Versements cumulés</TableHead>
-                    <TableHead className="results-header text-right">Plus-value</TableHead>
+          {/* Tableau de résultats avec Table responsif au lieu de ScrollArea */}
+          <div className="w-full overflow-x-auto">
+            <Table className="w-full table-fixed">
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="results-header w-[60px]">Année</TableHead>
+                  <TableHead className="results-header text-right">Capital</TableHead>
+                  <TableHead className="results-header text-right">Versements</TableHead>
+                  <TableHead className="results-header text-right">Plus-value</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {getAnneesClesCalcul().map((resultat) => (
+                  <TableRow key={resultat.annee}>
+                    <TableCell className="whitespace-nowrap">{resultat.annee}</TableCell>
+                    <TableCell className="text-right font-semibold whitespace-nowrap">
+                      {formatMontantEuro(resultat.capitalFinAnnee)}
+                    </TableCell>
+                    <TableCell className="text-right whitespace-nowrap">
+                      {formatMontantEuro(resultat.versementsCumules)}
+                    </TableCell>
+                    <TableCell className="text-right result-positive whitespace-nowrap">
+                      {formatMontantEuro(resultat.gainTotal)}
+                    </TableCell>
                   </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {getAnneesClesCalcul().map((resultat) => (
-                    <TableRow key={resultat.annee}>
-                      <TableCell>{resultat.annee}</TableCell>
-                      <TableCell className="text-right font-semibold">
-                        {formatMontantEuro(resultat.capitalFinAnnee)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {formatMontantEuro(resultat.versementsCumules)}
-                      </TableCell>
-                      <TableCell className="text-right result-positive">
-                        {formatMontantEuro(resultat.gainTotal)}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </ScrollArea>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
 
           {/* Publicité entre le tableau et le graphique */}
           <AdSpace position="bottom" />
@@ -322,3 +320,4 @@ const CustomTooltip = ({ active, payload, label, formatMontant }: any) => {
 InteretsComposes.displayName = "InteretsComposes";
 
 export default InteretsComposes;
+
