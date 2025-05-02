@@ -29,7 +29,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import AdSpace from "@/components/AdSpace";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface InteretsComposesProps {
   montantInitial?: string;
@@ -49,7 +49,6 @@ interface InteretsComposesProps {
 const InteretsComposes = memo((props: InteretsComposesProps) => {
   // Utiliser soit les props fournies, soit le hook local
   const hookValues = useInteretsComposes();
-  const isMobile = useIsMobile();
   
   const {
     montantInitial = props.montantInitial || hookValues.montantInitial,
@@ -98,22 +97,6 @@ const InteretsComposes = memo((props: InteretsComposesProps) => {
         dark: "#22c55e",
       },
     },
-  };
-
-  // Fonction pour déterminer quelles années afficher dans le tableau pour mobile
-  const getTableData = () => {
-    if (!resultats.length) return [];
-    
-    const anneesCles = getAnneesClesCalcul();
-    
-    if (isMobile) {
-      // Sur mobile, n'afficher que l'année de début et de fin
-      const debut = anneesCles[0];
-      const fin = anneesCles[anneesCles.length - 1];
-      return [debut, fin];
-    }
-    
-    return anneesCles;
   };
 
   return (
@@ -194,32 +177,28 @@ const InteretsComposes = memo((props: InteretsComposesProps) => {
 
       {resultats.length > 0 && (
         <>
-          {/* Tableau de résultats optimisé pour mobile */}
-          <div className="w-full">
-            <Table className="w-full">
+          {/* Tableau de résultats avec Table responsif au lieu de ScrollArea */}
+          <div className="w-full overflow-x-auto">
+            <Table className="w-full table-fixed">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="results-header">Année</TableHead>
+                  <TableHead className="results-header w-[60px]">Année</TableHead>
                   <TableHead className="results-header text-right">Capital</TableHead>
-                  {!isMobile && (
-                    <TableHead className="results-header text-right">Versements</TableHead>
-                  )}
+                  <TableHead className="results-header text-right">Versements</TableHead>
                   <TableHead className="results-header text-right">Plus-value</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {getTableData().map((resultat) => (
+                {getAnneesClesCalcul().map((resultat) => (
                   <TableRow key={resultat.annee}>
-                    <TableCell className="font-medium">{resultat.annee}</TableCell>
-                    <TableCell className="text-right font-semibold">
+                    <TableCell className="whitespace-nowrap">{resultat.annee}</TableCell>
+                    <TableCell className="text-right font-semibold whitespace-nowrap">
                       {formatMontantEuro(resultat.capitalFinAnnee)}
                     </TableCell>
-                    {!isMobile && (
-                      <TableCell className="text-right">
-                        {formatMontantEuro(resultat.versementsCumules)}
-                      </TableCell>
-                    )}
-                    <TableCell className="text-right result-positive">
+                    <TableCell className="text-right whitespace-nowrap">
+                      {formatMontantEuro(resultat.versementsCumules)}
+                    </TableCell>
+                    <TableCell className="text-right result-positive whitespace-nowrap">
                       {formatMontantEuro(resultat.gainTotal)}
                     </TableCell>
                   </TableRow>
@@ -242,38 +221,30 @@ const InteretsComposes = memo((props: InteretsComposesProps) => {
               config={chartConfig}
             >
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart 
-                  data={chartData} 
-                  margin={{ 
-                    top: 5, 
-                    right: isMobile ? 5 : 10, 
-                    left: isMobile ? -20 : 0, 
-                    bottom: 5 
-                  }}
-                >
+                <LineChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
                   <XAxis 
                     dataKey="annee" 
                     name="Année"
-                    tickFormatter={(value) => isMobile ? `${value}` : `A${value}`}
-                    interval={isMobile ? "preserveStartEnd" : undefined}
-                    tick={{ fontSize: isMobile ? 9 : 10 }}
+                    tickFormatter={(value) => `A${value}`}
+                    interval={"preserveStartEnd"}
+                    tick={{ fontSize: 10 }}
                   />
                   <YAxis 
                     tickFormatter={(value) => 
                       value >= 1000000 
-                        ? `${(value / 1000000).toFixed(0)}M` 
+                        ? `${(value / 1000000).toFixed(0)}M€` 
                         : value >= 1000 
-                          ? `${(value / 1000).toFixed(0)}k` 
-                          : `${value}`
+                          ? `${(value / 1000).toFixed(0)}k€` 
+                          : `${value}€`
                     }
-                    tick={{ fontSize: 9 }}
-                    width={isMobile ? 30 : 40}
+                    tick={{ fontSize: 10 }}
+                    width={40}
                   />
                   <Tooltip content={<CustomTooltip formatMontant={formatMontantEuro} />} />
                   <Legend 
-                    wrapperStyle={{ fontSize: isMobile ? '8px' : '10px' }}
-                    iconSize={isMobile ? 6 : 8}
+                    wrapperStyle={{ fontSize: '10px' }}
+                    iconSize={8}
                     verticalAlign="bottom"
                   />
                   <Line
@@ -282,24 +253,24 @@ const InteretsComposes = memo((props: InteretsComposesProps) => {
                     dataKey="capital"
                     stroke="var(--color-capital)"
                     strokeWidth={2}
-                    dot={{ r: isMobile ? 1 : 2 }}
-                    activeDot={{ r: isMobile ? 3 : 4 }}
+                    dot={{ r: 2 }}
+                    activeDot={{ r: 4 }}
                   />
                   <Line
-                    name="Versements"
+                    name="Versements cumulés"
                     type="monotone"
                     dataKey="versements"
                     stroke="var(--color-versements)"
-                    strokeWidth={1.5}
-                    dot={{ r: 0 }}
+                    strokeWidth={2}
+                    dot={{ r: 1 }}
                   />
                   <Line
-                    name="Intérêts"
+                    name="Intérêts générés"
                     type="monotone"
                     dataKey="interets"
                     stroke="var(--color-interets)"
-                    strokeWidth={1.5}
-                    dot={{ r: 0 }}
+                    strokeWidth={2}
+                    dot={{ r: 1 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -349,3 +320,4 @@ const CustomTooltip = ({ active, payload, label, formatMontant }: any) => {
 InteretsComposes.displayName = "InteretsComposes";
 
 export default InteretsComposes;
+
