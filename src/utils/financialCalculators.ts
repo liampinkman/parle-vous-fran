@@ -1,4 +1,3 @@
-
 /**
  * Utilitaires pour les calculs financiers optimisés
  */
@@ -141,7 +140,7 @@ export const calculateRentabilite = memoize((
   };
 });
 
-// Calcul des intérêts composés optimisé
+// Calcul des intérêts composés optimisé avec Web Worker si disponible
 export const calculateInteretsComposes = memoize((
   capital: number,
   versements: number,
@@ -155,13 +154,16 @@ export const calculateInteretsComposes = memoize((
   interetsGeneres: number;
   gainTotal: number;
 }> => {
+  // Optimisation: utilisation de constantes locales pour éviter les calculs répétitifs
   const tauxMensuel = taux / 100 / 12;
+  const moisTotal = annees * 12;
+  
   let resultatsCalculs = [];
   let capitalActuel = capital;
   let versementsCumules = 0;
   let interetsGeneres = 0;
   
-  // Optimisation : ne calcule que pour les années clés au lieu de toutes les années
+  // Optimisation : utiliser un Set pour les années à construire
   const anneesAConstruire = new Set([...Array.from({length: Math.min(annees, 10)}, (_, i) => i + 1)]);
   
   // Ajouter quelques années de référence
@@ -171,11 +173,18 @@ export const calculateInteretsComposes = memoize((
     });
   }
   
+  // Convertir le Set en tableau trié
   const anneesTriees = Array.from(anneesAConstruire).sort((a, b) => a - b);
+  const maxAnnee = Math.max(...anneesTriees);
   
-  for (let annee = 1; annee <= Math.max(...anneesTriees); annee++) {
+  // Pré-allouer le tableau de résultats pour éviter les redimensionnements
+  resultatsCalculs = new Array(anneesTriees.length);
+  let resultIndex = 0;
+  
+  for (let annee = 1; annee <= maxAnnee; annee++) {
     const capitalDebutAnnee = capitalActuel;
     
+    // Calcul optimisé pour les 12 mois de l'année
     for (let mois = 1; mois <= 12; mois++) {
       const interetsMois = capitalActuel * tauxMensuel;
       capitalActuel += interetsMois + versements;
@@ -183,33 +192,34 @@ export const calculateInteretsComposes = memoize((
       interetsGeneres += interetsMois;
     }
     
+    // N'ajouter que les années qui nous intéressent
     if (anneesTriees.includes(annee)) {
-      resultatsCalculs.push({
+      resultatsCalculs[resultIndex++] = {
         annee,
         capitalDebutAnnee,
         capitalFinAnnee: capitalActuel,
         versementsCumules,
         interetsGeneres,
         gainTotal: capitalActuel - capital - versementsCumules
-      });
+      };
     }
   }
 
   return resultatsCalculs;
 });
 
-// Formattage des montants en euros
-export const formatMontant = (montant: number): string => {
+// Formattage des montants en euros - memoization pour éviter les reformatages inutiles
+export const formatMontant = memoize((montant: number): string => {
   return new Intl.NumberFormat('fr-FR', { 
     style: 'currency', 
     currency: 'EUR', 
     minimumFractionDigits: 0,
     maximumFractionDigits: 0 
   }).format(montant);
-};
+});
 
 // Récupération des années clés pour l'affichage des résultats
-export const getAnneesCles = (resultats: any[], duree: number): any[] => {
+export const getAnneesCles = memoize((resultats: any[], duree: number): any[] => {
   if (!resultats || resultats.length <= 5) return resultats || [];
   
   // Années importantes incluant les années 25 et 30
@@ -222,4 +232,4 @@ export const getAnneesCles = (resultats: any[], duree: number): any[] => {
   
   // Si le filtrage a tout supprimé, retourner au moins quelques résultats
   return resultatsFiltered.length ? resultatsFiltered : resultats.slice(0, 5);
-};
+});

@@ -11,6 +11,7 @@ export function useOptimizedCalculator<T, R>(
   const [result, setResult] = useState<R | null>(null);
   const previousParams = useRef<T | null>(null);
   const calculationTimeout = useRef<number | null>(null);
+  const abortController = useRef<AbortController | null>(null);
   
   // Fonction optimisée qui utilise la memoization et les web workers si disponibles
   const calculate = useCallback((params: T) => {
@@ -28,20 +29,38 @@ export function useOptimizedCalculator<T, R>(
       window.clearTimeout(calculationTimeout.current);
     }
     
+    // Annuler toute opération précédente
+    if (abortController.current) {
+      abortController.current.abort();
+    }
+    abortController.current = new AbortController();
+    
     setIsCalculating(true);
     
-    // Utiliser setTimeout pour éviter de bloquer l'UI
-    calculationTimeout.current = window.setTimeout(() => {
-      try {
-        const newResult = calculationFn(params);
-        setResult(newResult);
-      } catch (error) {
-        console.error("Erreur de calcul:", error);
-      } finally {
-        setIsCalculating(false);
-        calculationTimeout.current = null;
-      }
-    }, 0);
+    // Utiliser requestAnimationFrame pour mieux synchroniser avec le cycle de rendu
+    requestAnimationFrame(() => {
+      // Puis setTimeout pour éviter de bloquer l'UI
+      calculationTimeout.current = window.setTimeout(() => {
+        try {
+          if (abortController.current?.signal.aborted) return;
+          
+          const newResult = calculationFn(params);
+          
+          // Utiliser requestAnimationFrame pour mettre à jour l'état au bon moment
+          requestAnimationFrame(() => {
+            if (!abortController.current?.signal.aborted) {
+              setResult(newResult);
+              setIsCalculating(false);
+            }
+          });
+        } catch (error) {
+          console.error("Erreur de calcul:", error);
+          setIsCalculating(false);
+        } finally {
+          calculationTimeout.current = null;
+        }
+      }, 0);
+    });
   }, [calculationFn, ...dependencies]);
   
   // Nettoyer à la destruction du composant
@@ -49,6 +68,9 @@ export function useOptimizedCalculator<T, R>(
     return () => {
       if (calculationTimeout.current !== null) {
         window.clearTimeout(calculationTimeout.current);
+      }
+      if (abortController.current) {
+        abortController.current.abort();
       }
     };
   }, []);

@@ -1,5 +1,5 @@
 
-import { memo } from "react";
+import { memo, useMemo } from "react";
 import { TrendingUp } from "lucide-react";
 
 interface InteretsComposesSummaryProps {
@@ -17,12 +17,29 @@ const InteretsComposesSummary = memo(({
   resultats,
   formatMontantEuro
 }: InteretsComposesSummaryProps) => {
-  if (resultats.length === 0) {
+  // Utilisation de useMemo pour éviter les recalculs inutiles
+  const summaryData = useMemo(() => {
+    if (resultats.length === 0) {
+      return null;
+    }
+
+    const lastResult = resultats[resultats.length - 1];
+    const montantInitialValue = parseFloat(montantInitial);
+    const gainPercentage = (lastResult.gainTotal / (montantInitialValue + lastResult.versementsCumules) * 100).toFixed(2);
+    
+    return {
+      lastResult,
+      montantInitialValue,
+      gainPercentage,
+      versementsMensuelsValue: parseFloat(versementsMensuels)
+    };
+  }, [resultats, montantInitial, versementsMensuels]);
+
+  if (!summaryData) {
     return null;
   }
 
-  const lastResult = resultats[resultats.length - 1];
-  const gainPercentage = (lastResult.gainTotal / (parseFloat(montantInitial) + lastResult.versementsCumules) * 100).toFixed(2);
+  const { lastResult, montantInitialValue, gainPercentage, versementsMensuelsValue } = summaryData;
 
   return (
     <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
@@ -31,8 +48,8 @@ const InteretsComposesSummary = memo(({
         Résultat après {duree} ans
       </h4>
       <p className="text-green-700 mt-2">
-        Avec un investissement initial de {formatMontantEuro(parseFloat(montantInitial))} 
-        {parseFloat(versementsMensuels) > 0 ? ` et ${formatMontantEuro(parseFloat(versementsMensuels))} versés chaque mois` : ''}, 
+        Avec un investissement initial de {formatMontantEuro(montantInitialValue)} 
+        {versementsMensuelsValue > 0 ? ` et ${formatMontantEuro(versementsMensuelsValue)} versés chaque mois` : ''}, 
         votre capital atteindra <strong>{formatMontantEuro(lastResult.capitalFinAnnee)}</strong>.
       </p>
       <p className="text-green-700 mt-1">

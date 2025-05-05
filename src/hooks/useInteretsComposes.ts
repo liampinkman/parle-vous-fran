@@ -1,7 +1,8 @@
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { calculateInteretsComposes, getAnneesCles, formatMontant } from "@/utils/financialCalculators";
+import { useOptimizedCalculator } from "./useOptimizedCalculator";
 
 interface ResultatInteret {
   annee: number;
@@ -20,7 +21,18 @@ export const useInteretsComposes = () => {
   const [resultats, setResultats] = useState<ResultatInteret[]>([]);
   const { toast } = useToast();
 
-  const calculerInteretsComposes = () => {
+  // Utiliser le hook optimisé pour les calculs
+  const { calculate: runCalculation, isCalculating } = useOptimizedCalculator((params: {
+    capital: number;
+    versements: number;
+    taux: number;
+    annees: number;
+  }) => {
+    const { capital, versements, taux, annees } = params;
+    return calculateInteretsComposes(capital, versements, taux, annees);
+  }, []);
+
+  const calculerInteretsComposes = useCallback(() => {
     if (!montantInitial || isNaN(parseFloat(montantInitial)) || parseFloat(montantInitial) < 0) {
       toast({
         title: "Erreur de saisie",
@@ -64,23 +76,24 @@ export const useInteretsComposes = () => {
     const taux = parseFloat(tauxAnnuel);
     const annees = parseInt(duree);
     
-    const resultatsCalculs = calculateInteretsComposes(capital, versements, taux, annees);
-    
-    setResultats(resultatsCalculs);
-    
-    toast({
-      title: "Calcul effectué",
-      description: "Vos intérêts composés ont été calculés avec succès.",
+    // Exécuter le calcul de manière optimisée
+    runCalculation({ capital, versements, taux, annees }, (resultatsCalculs) => {
+      setResultats(resultatsCalculs);
+      
+      toast({
+        title: "Calcul effectué",
+        description: "Vos intérêts composés ont été calculés avec succès.",
+      });
     });
-  };
+  }, [montantInitial, versementsMensuels, tauxAnnuel, duree, toast, runCalculation]);
 
-  const getAnneesClesCalcul = () => {
+  const getAnneesClesCalcul = useCallback(() => {
     return getAnneesCles(resultats, parseInt(duree));
-  };
+  }, [resultats, duree]);
 
-  const formatMontantEuro = (montant: number) => {
+  const formatMontantEuro = useCallback((montant: number) => {
     return formatMontant(montant);
-  };
+  }, []);
 
   return {
     montantInitial,
@@ -94,6 +107,7 @@ export const useInteretsComposes = () => {
     resultats,
     calculerInteretsComposes,
     getAnneesClesCalcul,
-    formatMontantEuro
+    formatMontantEuro,
+    isCalculating
   };
 };
