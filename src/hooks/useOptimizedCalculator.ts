@@ -1,7 +1,8 @@
 
-import { useMemo, useCallback, useState, useRef, useEffect } from "react";
+import { useCallback, useState, useRef, useEffect } from "react";
 
 type CalculationFunction<T, R> = (params: T) => R;
+type ResultCallback<R> = (result: R) => void;
 
 export function useOptimizedCalculator<T, R>(
   calculationFn: CalculationFunction<T, R>,
@@ -14,11 +15,14 @@ export function useOptimizedCalculator<T, R>(
   const abortController = useRef<AbortController | null>(null);
   
   // Fonction optimisée qui utilise la memoization et les web workers si disponibles
-  const calculate = useCallback((params: T) => {
+  const calculate = useCallback((params: T, callback?: ResultCallback<R>) => {
     // Vérifier si les paramètres sont les mêmes que la dernière fois
     if (previousParams.current && 
         JSON.stringify(previousParams.current) === JSON.stringify(params)) {
-      return; // Ne pas recalculer si les paramètres sont identiques
+      if (result && callback) {
+        callback(result);
+      }
+      return;
     }
     
     // Enregistrer les nouveaux paramètres
@@ -51,6 +55,11 @@ export function useOptimizedCalculator<T, R>(
             if (!abortController.current?.signal.aborted) {
               setResult(newResult);
               setIsCalculating(false);
+              
+              // Appeler le callback avec le résultat si fourni
+              if (callback) {
+                callback(newResult);
+              }
             }
           });
         } catch (error) {
@@ -61,7 +70,7 @@ export function useOptimizedCalculator<T, R>(
         }
       }, 0);
     });
-  }, [calculationFn, ...dependencies]);
+  }, [calculationFn, result, ...dependencies]);
   
   // Nettoyer à la destruction du composant
   useEffect(() => {

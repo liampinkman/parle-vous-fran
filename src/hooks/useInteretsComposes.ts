@@ -76,7 +76,7 @@ export const useInteretsComposes = () => {
     const taux = parseFloat(tauxAnnuel);
     const annees = parseInt(duree);
     
-    // Exécuter le calcul de manière optimisée
+    // Correction: Passer un seul argument (l'objet de paramètres) et une callback pour traiter les résultats
     runCalculation({ capital, versements, taux, annees }, (resultatsCalculs) => {
       setResultats(resultatsCalculs);
       
