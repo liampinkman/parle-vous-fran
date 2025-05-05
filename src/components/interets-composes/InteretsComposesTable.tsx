@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 interface TableResult {
   annee: number;
@@ -89,44 +90,48 @@ const InteretsComposesTable = memo(({ results, formatMontantEuro }: InteretsComp
         </button>
       )}
       
-      {/* Tableau avec scroll horizontal amélioré */}
-      <div 
-        ref={tableScrollRef} 
-        className="w-full overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent pb-2 pt-1 px-1 -mx-1"
-        onScroll={checkScrollIndicators}
-        style={{ scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' }}
-      >
-        <Table className="w-full table-fixed min-w-[500px]">
-          <TableHeader>
-            <TableRow>
-              <TableHead className="results-header w-[60px]">Année</TableHead>
-              <TableHead className="results-header text-right">Capital</TableHead>
-              <TableHead className="results-header text-right">Versements</TableHead>
-              <TableHead className="results-header text-right">Plus-value</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {results.map((resultat) => (
-              <TableRow key={resultat.annee}>
-                <TableCell className="whitespace-nowrap">{resultat.annee}</TableCell>
-                <TableCell className="text-right font-semibold whitespace-nowrap">
-                  {formatMontantEuro(resultat.capitalFinAnnee)}
-                </TableCell>
-                <TableCell className="text-right whitespace-nowrap">
-                  {formatMontantEuro(resultat.versementsCumules)}
-                </TableCell>
-                <TableCell className="text-right result-positive whitespace-nowrap">
-                  {formatMontantEuro(resultat.gainTotal)}
-                </TableCell>
+      {/* ScrollArea pour une meilleure expérience de défilement horizontal */}
+      <ScrollArea className="w-full h-full border rounded-md">
+        <div 
+          ref={tableScrollRef} 
+          className="w-full overflow-x-auto pb-2 pt-1 px-1 -mx-1"
+          onScroll={checkScrollIndicators}
+          style={{ scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' }}
+        >
+          <Table className="w-full table-fixed min-w-[500px]">
+            <TableHeader>
+              <TableRow>
+                <TableHead className="results-header w-[60px]">Année</TableHead>
+                <TableHead className="results-header text-right">Capital</TableHead>
+                <TableHead className="results-header text-right">Versements</TableHead>
+                <TableHead className="results-header text-right">Plus-value</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+            </TableHeader>
+            <TableBody>
+              {results.map((resultat) => (
+                <TableRow key={resultat.annee}>
+                  <TableCell className="whitespace-nowrap">{resultat.annee}</TableCell>
+                  <TableCell className="text-right font-semibold whitespace-nowrap">
+                    {formatMontantEuro(resultat.capitalFinAnnee)}
+                  </TableCell>
+                  <TableCell className="text-right whitespace-nowrap">
+                    {formatMontantEuro(resultat.versementsCumules)}
+                  </TableCell>
+                  <TableCell className="text-right result-positive whitespace-nowrap">
+                    {formatMontantEuro(resultat.gainTotal)}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+        {/* Ajout d'une ScrollBar horizontale visible en permanence */}
+        <ScrollBar orientation="horizontal" className="bg-gray-200 h-2" />
+      </ScrollArea>
       
       {/* Instructions mobiles */}
       <div className="md:hidden text-xs text-center text-muted-foreground mt-1">
-        Glissez horizontalement pour voir toutes les données
+        Glissez horizontalement ou utilisez la barre de défilement pour voir toutes les données
       </div>
     </div>
   );
