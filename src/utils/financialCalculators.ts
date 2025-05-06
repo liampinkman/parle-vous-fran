@@ -222,7 +222,7 @@ export const formatMontant = memoize((montant: number): string => {
 export const getAnneesCles = memoize((resultats: any[], duree: number): any[] => {
   if (!resultats || resultats.length <= 5) return resultats || [];
   
-  // Années importantes incluant les années 25 et 30
+  // Années importantes incluant les années jusqu'à 40 ans
   const anneesImportantes = [1, 5, 10, 15, 20, 25, 30, 35, 40];
   const resultatsFiltered = resultats.filter(r => 
     anneesImportantes.includes(r.annee) || 

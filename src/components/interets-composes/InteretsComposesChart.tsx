@@ -104,8 +104,8 @@ const InteretsComposesChart = memo(({
     const dureeTotale = parseInt(duree, 10);
     
     return chartData.filter(item => 
-      item.annee % 5 === 0 || // Années multiples de 5
       item.annee === 1 || // Première année
+      item.annee % 5 === 0 || // Années multiples de 5
       item.annee === dureeTotale // Année finale
     ).sort((a, b) => a.annee - b.annee); // S'assurer que les données sont triées par année
     
@@ -150,7 +150,7 @@ const InteretsComposesChart = memo(({
   // Détermine la largeur du graphique basée sur le nombre de points de données et sur la plateforme
   const chartWidth = isMobile 
     ? Math.max(filteredChartData.length * 70, 320) // Sur mobile, au moins 320px ou 70px par point de données
-    : Math.max(filteredChartData.length * 100, '100%'); // Sur desktop, au moins 100px par point ou la largeur complète
+    : Math.max(filteredChartData.length * 100, 100); // Sur desktop, au moins 100px par point ou 100% (corrigé de '100%' à 100)
 
   return (
     <div className="bg-white rounded-lg border p-4 h-auto relative">
