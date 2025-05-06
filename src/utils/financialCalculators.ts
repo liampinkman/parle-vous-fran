@@ -220,9 +220,16 @@ export const formatMontant = memoize((montant: number): string => {
 
 // Récupération des années clés pour l'affichage des résultats
 export const getAnneesCles = memoize((resultats: any[], duree: number): any[] => {
-  if (!resultats || resultats.length === 0) return resultats || [];
+  if (!resultats || resultats.length <= 5) return resultats || [];
   
-  // Modification: retourner toutes les années au lieu de filtrer
-  // Cela garantit que toutes les années calculées sont affichées
-  return resultats.filter(r => r.annee <= duree);
+  // Années importantes incluant les années 25 et 30
+  const anneesImportantes = [1, 5, 10, 15, 20, 25, 30, 35, 40];
+  const resultatsFiltered = resultats.filter(r => 
+    anneesImportantes.includes(r.annee) || 
+    r.annee === duree || 
+    r.annee === resultats.length
+  );
+  
+  // Si le filtrage a tout supprimé, retourner au moins quelques résultats
+  return resultatsFiltered.length ? resultatsFiltered : resultats.slice(0, 5);
 });
