@@ -1,5 +1,5 @@
 
-import { memo, useRef, useState, useEffect } from "react";
+import { memo, useRef, useState, useEffect, useMemo } from "react";
 import { ChartLine, ArrowLeft, ArrowRight } from "lucide-react";
 import {
   LineChart,
@@ -96,6 +96,21 @@ const InteretsComposesChart = memo(({
   const [showLeftScroll, setShowLeftScroll] = useState(false);
   const [showRightScroll, setShowRightScroll] = useState(false);
 
+  // Générer les données du graphique par tranches de 5 ans
+  const filteredChartData = useMemo(() => {
+    if (!chartData.length) return [];
+    
+    // Filtrer les données pour ne conserver que les années multiples de 5 et l'année finale
+    const dureeTotale = parseInt(duree, 10);
+    
+    return chartData.filter(item => 
+      item.annee % 5 === 0 || // Années multiples de 5
+      item.annee === 1 || // Première année
+      item.annee === dureeTotale // Année finale
+    ).sort((a, b) => a.annee - b.annee); // S'assurer que les données sont triées par année
+    
+  }, [chartData, duree]);
+
   // Fonction pour vérifier et mettre à jour les indicateurs de scroll
   const checkScrollIndicators = () => {
     if (chartScrollRef.current) {
@@ -115,7 +130,7 @@ const InteretsComposesChart = memo(({
     // Ajout d'un léger délai pour garantir que les dimensions sont calculées
     const timer = setTimeout(checkScrollIndicators, 100);
     return () => clearTimeout(timer);
-  }, [chartData.length]);
+  }, [filteredChartData.length]);
 
   // Fonction pour faire défiler le graphique horizontalement
   const scrollChart = (direction: 'left' | 'right') => {
@@ -128,20 +143,20 @@ const InteretsComposesChart = memo(({
     }
   };
 
-  if (chartData.length === 0) {
+  if (filteredChartData.length === 0) {
     return null;
   }
 
   // Détermine la largeur du graphique basée sur le nombre de points de données et sur la plateforme
   const chartWidth = isMobile 
-    ? Math.max(chartData.length * 30, 320) // Sur mobile, au moins 320px ou 30px par point de données
-    : '100%'; // Sur desktop, utilise la largeur complète
+    ? Math.max(filteredChartData.length * 70, 320) // Sur mobile, au moins 320px ou 70px par point de données
+    : Math.max(filteredChartData.length * 100, '100%'); // Sur desktop, au moins 100px par point ou la largeur complète
 
   return (
     <div className="bg-white rounded-lg border p-4 h-auto relative">
       <h4 className="text-sm font-medium mb-4 text-primary flex items-center gap-2">
         <ChartLine size={18} />
-        Évolution de votre capital sur {duree} ans
+        Évolution de votre capital par tranches de 5 ans
       </h4>
 
       {/* Indicateurs de défilement */}
@@ -177,13 +192,13 @@ const InteretsComposesChart = memo(({
               config={chartConfig}
             >
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={chartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+                <LineChart data={filteredChartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
                   <XAxis 
                     dataKey="annee" 
                     name="Année"
                     tickFormatter={(value) => `A${value}`}
-                    interval={"preserveStartEnd"}
+                    interval={0}
                     tick={{ fontSize: 10 }}
                   />
                   <YAxis 
@@ -209,8 +224,8 @@ const InteretsComposesChart = memo(({
                     dataKey="capital"
                     stroke="var(--color-capital)"
                     strokeWidth={2}
-                    dot={{ r: 2 }}
-                    activeDot={{ r: 4 }}
+                    dot={{ r: 3 }}
+                    activeDot={{ r: 5 }}
                   />
                   <Line
                     name="Versements cumulés"
@@ -218,7 +233,7 @@ const InteretsComposesChart = memo(({
                     dataKey="versements"
                     stroke="var(--color-versements)"
                     strokeWidth={2}
-                    dot={{ r: 1 }}
+                    dot={{ r: 2 }}
                   />
                   <Line
                     name="Intérêts générés"
@@ -226,7 +241,7 @@ const InteretsComposesChart = memo(({
                     dataKey="interets"
                     stroke="var(--color-interets)"
                     strokeWidth={2}
-                    dot={{ r: 1 }}
+                    dot={{ r: 2 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
