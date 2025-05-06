@@ -1,3 +1,4 @@
+
 /**
  * Utilitaires pour les calculs financiers optimisés
  */
@@ -164,11 +165,11 @@ export const calculateInteretsComposes = memoize((
   let interetsGeneres = 0;
   
   // Optimisation : utiliser un Set pour les années à construire
-  const anneesAConstruire = new Set([...Array.from({length: Math.min(annees, 10)}, (_, i) => i + 1)]);
+  const anneesAConstruire = new Set([...Array.from({length: Math.min(annees, 40)}, (_, i) => i + 1)]);
   
   // Ajouter quelques années de référence
-  if (annees > 10) {
-    [15, 20, 25, 30, annees].forEach(a => {
+  if (annees > 40) {
+    [45, 50, annees].forEach(a => {
       if (a <= annees) anneesAConstruire.add(a);
     });
   }
