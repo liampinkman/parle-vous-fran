@@ -150,12 +150,10 @@ const InteretsComposesChart = memo(({
     return null;
   }
 
-  // Amélioration: ajuster la largeur du graphique pour mobile
-  // - Sur mobile: plus d'espace entre les points (90px au lieu de 70px)
-  // - Définir une largeur minimale plus grande pour éviter les problèmes d'affichage
+  // Détermine la largeur du graphique basée sur le nombre de points de données et sur la plateforme
   const chartWidth = isMobile 
-    ? Math.max(filteredChartData.length * 90, 480) // Augmenté pour mobile
-    : Math.max(filteredChartData.length * 100, 100);
+    ? Math.max(filteredChartData.length * 70, 320) // Sur mobile, au moins 320px ou 70px par point de données
+    : Math.max(filteredChartData.length * 100, 100); // Sur desktop, au moins 100px par point ou 100%
 
   return (
     <div className="bg-white rounded-lg border p-4 h-auto relative">
@@ -191,7 +189,7 @@ const InteretsComposesChart = memo(({
           onScroll={checkScrollIndicators}
           style={{ scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' }}
         >
-          <div style={{ width: `${chartWidth}px`, minWidth: '100%', height: '100%' }}>
+          <div style={{ width: chartWidth, minWidth: '100%' }}>
             <ChartContainer
               className="h-[280px] md:h-80 overflow-visible"
               config={chartConfig}
@@ -204,7 +202,7 @@ const InteretsComposesChart = memo(({
                     name="Année"
                     tickFormatter={(value) => `A${value}`}
                     interval={0}
-                    tick={{ fontSize: isMobile ? 8 : 10 }}
+                    tick={{ fontSize: 10 }}
                   />
                   <YAxis 
                     tickFormatter={(value) => 
@@ -214,13 +212,13 @@ const InteretsComposesChart = memo(({
                           ? `${(value / 1000).toFixed(0)}k€` 
                           : `${value}€`
                     }
-                    tick={{ fontSize: isMobile ? 8 : 10 }}
-                    width={isMobile ? 30 : 40}
+                    tick={{ fontSize: 10 }}
+                    width={40}
                   />
                   <Tooltip content={<CustomTooltip formatMontant={formatMontantEuro} />} />
                   <Legend 
-                    wrapperStyle={{ fontSize: isMobile ? '8px' : '10px' }}
-                    iconSize={isMobile ? 6 : 8}
+                    wrapperStyle={{ fontSize: '10px' }}
+                    iconSize={8}
                     verticalAlign="bottom"
                   />
                   <Line
@@ -229,8 +227,8 @@ const InteretsComposesChart = memo(({
                     dataKey="capital"
                     stroke="var(--color-capital)"
                     strokeWidth={2}
-                    dot={{ r: isMobile ? 2 : 3 }}
-                    activeDot={{ r: isMobile ? 4 : 5 }}
+                    dot={{ r: 3 }}
+                    activeDot={{ r: 5 }}
                   />
                   <Line
                     name="Versements cumulés"
@@ -238,7 +236,7 @@ const InteretsComposesChart = memo(({
                     dataKey="versements"
                     stroke="var(--color-versements)"
                     strokeWidth={2}
-                    dot={{ r: isMobile ? 1.5 : 2 }}
+                    dot={{ r: 2 }}
                   />
                   <Line
                     name="Intérêts générés"
@@ -246,7 +244,7 @@ const InteretsComposesChart = memo(({
                     dataKey="interets"
                     stroke="var(--color-interets)"
                     strokeWidth={2}
-                    dot={{ r: isMobile ? 1.5 : 2 }}
+                    dot={{ r: 2 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
