@@ -1,6 +1,7 @@
 
 import { DollarSign } from "lucide-react";
 import { useRef, useEffect, useState, memo } from "react";
+import { useAdRefresh } from "@/hooks/useAdRefresh";
 
 interface AdSpaceProps {
   position: "sidebar" | "bottom";
@@ -11,6 +12,12 @@ const AdSpace = memo(({ position, refreshKey = 0 }: AdSpaceProps) => {
   const adRef = useRef<HTMLDivElement>(null);
   const [adId, setAdId] = useState(`ad-${Math.random().toString(36).substring(2, 9)}`);
   const [isVisible, setIsVisible] = useState(false);
+  const { shouldDisplayAd } = useAdRefresh();
+  
+  // Ne pas afficher si shouldDisplayAd indique que non
+  if (!shouldDisplayAd(position)) {
+    return null;
+  }
   
   // Observer pour le lazy loading des publicités
   useEffect(() => {
@@ -40,12 +47,12 @@ const AdSpace = memo(({ position, refreshKey = 0 }: AdSpaceProps) => {
       // Ici vous pourriez appeler l'API de votre réseau publicitaire pour rafraîchir les annonces
       console.log(`Publicité rafraîchie: ${position} - ${adId}`);
     }
-  }, [refreshKey, position, isVisible]);
+  }, [refreshKey, position, isVisible, adId]);
 
   const baseStyles = "bg-gray-50 border border-gray-200 rounded-lg p-4 flex items-center justify-center transition-opacity";
   const styles = {
     sidebar: `${baseStyles} w-full h-[250px] mb-4 md:h-[300px]`,
-    bottom: `${baseStyles} w-full h-[90px] mt-6 md:h-[120px] md:mt-8`
+    bottom: `${baseStyles} w-full h-[90px] md:h-[120px]`
   };
 
   return (
@@ -53,6 +60,7 @@ const AdSpace = memo(({ position, refreshKey = 0 }: AdSpaceProps) => {
       className={`${styles[position]} ${isVisible ? 'opacity-100' : 'opacity-0'}`} 
       ref={adRef} 
       key={adId}
+      data-ad-position={position}
     >
       <div className="text-gray-400 flex flex-col items-center">
         <DollarSign className="w-6 h-6 md:w-8 md:h-8 mb-2" />

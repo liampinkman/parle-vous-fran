@@ -72,8 +72,10 @@ const InteretsComposes = memo((props: InteretsComposesProps) => {
             formatMontantEuro={formatMontantEuro}
           />
 
-          {/* Publicité entre le tableau et le graphique */}
-          <AdSpace position="bottom" />
+          {/* Publicité entre le tableau et le graphique - avec une marge plus importante */}
+          <div className="my-8">
+            <AdSpace position="bottom" />
+          </div>
 
           <InteretsComposesChart 
             chartData={chartData}
