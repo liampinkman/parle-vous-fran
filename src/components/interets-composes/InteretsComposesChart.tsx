@@ -1,55 +1,11 @@
 
 import { memo, useRef, useState, useEffect, useMemo } from "react";
-import { ChartLine, ArrowLeft, ArrowRight } from "lucide-react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
-import {
-  ChartContainer,
-} from "@/components/ui/chart";
+import { ChartLine } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useIsMobile } from "@/hooks/use-mobile";
-
-// Tooltip component moved inside the file
-interface CustomTooltipProps {
-  active?: boolean;
-  payload?: any[];
-  label?: string;
-  formatMontant: (montant: number) => string;
-}
-
-const CustomTooltip = ({ active, payload, formatMontant }: CustomTooltipProps) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-white p-2 border rounded-md shadow-md text-xs">
-        <p className="font-semibold mb-1">Année {payload[0].payload.annee}</p>
-        {payload.map((entry: any, index: number) => (
-          <div key={`item-${index}`} className="flex justify-between gap-3 items-center">
-            <span style={{ color: entry.color }}>{entry.name} :</span>
-            <span className="font-medium">{formatMontant(entry.value)}</span>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  return null;
-};
-
-interface ChartDataItem {
-  name: string;
-  annee: number;
-  capital: number;
-  versements: number;
-  interets: number;
-}
+import ChartContent from "./chart/ChartContent";
+import ChartScrollButtons from "./chart/ChartScrollButtons";
+import { filterChartData, getChartWidth, ChartDataItem } from "./chart/chartConfig";
 
 interface InteretsComposesChartProps {
   chartData: ChartDataItem[];
@@ -62,80 +18,42 @@ const InteretsComposesChart = memo(({
   duree,
   formatMontantEuro
 }: InteretsComposesChartProps) => {
-  // Configuration des couleurs pour le graphique
-  const chartConfig = {
-    capital: {
-      label: "Capital total",
-      theme: {
-        light: "#2563eb",
-        dark: "#3b82f6",
-      },
-    },
-    versements: {
-      label: "Versements cumulés",
-      theme: {
-        light: "#9333ea",
-        dark: "#a855f7",
-      },
-    },
-    interets: {
-      label: "Intérêts générés",
-      theme: {
-        light: "#16a34a",
-        dark: "#22c55e",
-      },
-    },
-  };
-
   const isMobile = useIsMobile();
   
-  // Ref pour le chart container
+  // Ref for the chart container
   const chartScrollRef = useRef<HTMLDivElement>(null);
   
-  // States pour contrôler la visualisation des indicateurs de scroll
+  // States to control scroll indicator visualization
   const [showLeftScroll, setShowLeftScroll] = useState(false);
   const [showRightScroll, setShowRightScroll] = useState(false);
 
-  // Générer les données du graphique par tranches de 5 ans
+  // Filter chart data to show key years
   const filteredChartData = useMemo(() => {
-    if (!chartData.length) return [];
-    
-    // Filtrer les données pour conserver les années 1, multiples de 5, et l'année finale
-    const dureeTotale = parseInt(duree, 10);
-    
-    // Années clés que nous voulons afficher (1, 5, 10, 15, 20, 25, 30, 35)
-    const annesCles = [1, 5, 10, 15, 20, 25, 30, 35];
-    
-    return chartData.filter(item => 
-      annesCles.includes(item.annee) || // Années clés
-      item.annee % 5 === 0 || // Autres années multiples de 5 (pour la complétude)
-      item.annee === dureeTotale // Année finale
-    ).sort((a, b) => a.annee - b.annee); // S'assurer que les données sont triées par année
-    
+    return filterChartData(chartData, duree);
   }, [chartData, duree]);
 
-  // Fonction pour vérifier et mettre à jour les indicateurs de scroll
+  // Function to check and update scroll indicators
   const checkScrollIndicators = () => {
     if (chartScrollRef.current) {
       const { scrollLeft, scrollWidth, clientWidth } = chartScrollRef.current;
       
-      // Afficher l'indicateur gauche si le scroll n'est pas tout à gauche
+      // Show left indicator if not scrolled all the way to the left
       setShowLeftScroll(scrollLeft > 0);
       
-      // Afficher l'indicateur droit si le scroll n'est pas tout à droite
+      // Show right indicator if not scrolled all the way to the right
       setShowRightScroll(Math.ceil(scrollLeft + clientWidth) < scrollWidth - 1);
     }
   };
 
-  // Vérifier les indicateurs de scroll au chargement et quand les données changent
+  // Check scroll indicators on load and when data changes
   useEffect(() => {
     checkScrollIndicators();
-    // Ajout d'un léger délai pour garantir que les dimensions sont calculées
+    // Add a slight delay to ensure dimensions are calculated
     const timer = setTimeout(checkScrollIndicators, 100);
     return () => clearTimeout(timer);
   }, [filteredChartData.length]);
 
-  // Fonction pour faire défiler le graphique horizontalement
+  // Function to scroll the chart horizontally
   const scrollChart = (direction: 'left' | 'right') => {
     if (chartScrollRef.current) {
       const scrollAmount = chartScrollRef.current.clientWidth / 2;
@@ -150,10 +68,8 @@ const InteretsComposesChart = memo(({
     return null;
   }
 
-  // Détermine la largeur du graphique basée sur le nombre de points de données et sur la plateforme
-  const chartWidth = isMobile 
-    ? Math.max(filteredChartData.length * 70, 320) // Sur mobile, au moins 320px ou 70px par point de données
-    : Math.max(filteredChartData.length * 100, 100); // Sur desktop, au moins 100px par point ou 100%
+  // Determine chart width based on data points and platform
+  const chartWidth = getChartWidth(filteredChartData.length, isMobile);
 
   return (
     <div className="bg-white rounded-lg border p-4 h-auto relative">
@@ -162,25 +78,12 @@ const InteretsComposesChart = memo(({
         Évolution de votre capital par tranches de 5 ans
       </h4>
 
-      {/* Indicateurs de défilement */}
-      {showLeftScroll && (
-        <button 
-          onClick={() => scrollChart('left')} 
-          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 dark:bg-gray-800/80 p-2 rounded-full shadow-md border border-gray-200"
-          aria-label="Défiler à gauche"
-        >
-          <ArrowLeft size={16} className="text-gray-600" />
-        </button>
-      )}
-      {showRightScroll && (
-        <button 
-          onClick={() => scrollChart('right')} 
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 dark:bg-gray-800/80 p-2 rounded-full shadow-md border border-gray-200"
-          aria-label="Défiler à droite"
-        >
-          <ArrowRight size={16} className="text-gray-600" />
-        </button>
-      )}
+      {/* Scroll indicators */}
+      <ChartScrollButtons 
+        showLeftScroll={showLeftScroll}
+        showRightScroll={showRightScroll}
+        onScroll={scrollChart}
+      />
 
       <ScrollArea className="w-full">
         <div 
@@ -190,70 +93,15 @@ const InteretsComposesChart = memo(({
           style={{ scrollBehavior: 'smooth', WebkitOverflowScrolling: 'touch' }}
         >
           <div style={{ width: chartWidth, minWidth: '100%' }}>
-            <ChartContainer
-              className="h-[280px] md:h-80 overflow-visible"
-              config={chartConfig}
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={filteredChartData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
-                  <XAxis 
-                    dataKey="annee" 
-                    name="Année"
-                    tickFormatter={(value) => `A${value}`}
-                    interval={0}
-                    tick={{ fontSize: 10 }}
-                  />
-                  <YAxis 
-                    tickFormatter={(value) => 
-                      value >= 1000000 
-                        ? `${(value / 1000000).toFixed(0)}M€` 
-                        : value >= 1000 
-                          ? `${(value / 1000).toFixed(0)}k€` 
-                          : `${value}€`
-                    }
-                    tick={{ fontSize: 10 }}
-                    width={40}
-                  />
-                  <Tooltip content={<CustomTooltip formatMontant={formatMontantEuro} />} />
-                  <Legend 
-                    wrapperStyle={{ fontSize: '10px' }}
-                    iconSize={8}
-                    verticalAlign="bottom"
-                  />
-                  <Line
-                    name="Capital total"
-                    type="monotone"
-                    dataKey="capital"
-                    stroke="var(--color-capital)"
-                    strokeWidth={2}
-                    dot={{ r: 3 }}
-                    activeDot={{ r: 5 }}
-                  />
-                  <Line
-                    name="Versements cumulés"
-                    type="monotone"
-                    dataKey="versements"
-                    stroke="var(--color-versements)"
-                    strokeWidth={2}
-                    dot={{ r: 2 }}
-                  />
-                  <Line
-                    name="Intérêts générés"
-                    type="monotone"
-                    dataKey="interets"
-                    stroke="var(--color-interets)"
-                    strokeWidth={2}
-                    dot={{ r: 2 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </ChartContainer>
+            <ChartContent 
+              data={filteredChartData}
+              formatMontantEuro={formatMontantEuro}
+            />
           </div>
         </div>
       </ScrollArea>
       
-      {/* Instructions mobiles */}
+      {/* Mobile instructions */}
       <div className="md:hidden text-xs text-center text-muted-foreground mt-1">
         Glissez horizontalement pour voir toutes les données
       </div>
