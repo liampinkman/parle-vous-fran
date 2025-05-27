@@ -2,7 +2,6 @@
 import { useState, useCallback } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { calculateInteretsComposes, getAnneesCles, formatMontant } from "@/utils/financialCalculators";
-import { useOptimizedCalculator } from "./useOptimizedCalculator";
 
 interface ResultatInteret {
   annee: number;
@@ -19,18 +18,8 @@ export const useInteretsComposes = () => {
   const [tauxAnnuel, setTauxAnnuel] = useState<string>("7");
   const [duree, setDuree] = useState<string>("20");
   const [resultats, setResultats] = useState<ResultatInteret[]>([]);
+  const [isCalculating, setIsCalculating] = useState(false);
   const { toast } = useToast();
-
-  // Utiliser le hook optimisé pour les calculs
-  const { calculate: runCalculation, isCalculating } = useOptimizedCalculator((params: {
-    capital: number;
-    versements: number;
-    taux: number;
-    annees: number;
-  }) => {
-    const { capital, versements, taux, annees } = params;
-    return calculateInteretsComposes(capital, versements, taux, annees);
-  }, []);
 
   const calculerInteretsComposes = useCallback(() => {
     if (!montantInitial || isNaN(parseFloat(montantInitial)) || parseFloat(montantInitial) < 0) {
@@ -76,16 +65,28 @@ export const useInteretsComposes = () => {
     const taux = parseFloat(tauxAnnuel);
     const annees = parseInt(duree);
     
-    // Correction: Passer un seul argument (l'objet de paramètres) et une callback pour traiter les résultats
-    runCalculation({ capital, versements, taux, annees }, (resultatsCalculs) => {
+    setIsCalculating(true);
+    
+    try {
+      // Use the memoized function directly instead of the optimization hook
+      const resultatsCalculs = calculateInteretsComposes(capital, versements, taux, annees);
       setResultats(resultatsCalculs);
       
       toast({
         title: "Calcul effectué",
         description: "Vos intérêts composés ont été calculés avec succès.",
       });
-    });
-  }, [montantInitial, versementsMensuels, tauxAnnuel, duree, toast, runCalculation]);
+    } catch (error) {
+      console.error("Erreur lors du calcul:", error);
+      toast({
+        title: "Erreur de calcul",
+        description: "Une erreur est survenue lors du calcul. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCalculating(false);
+    }
+  }, [montantInitial, versementsMensuels, tauxAnnuel, duree, toast]);
 
   const getAnneesClesCalcul = useCallback(() => {
     return getAnneesCles(resultats, parseInt(duree));
