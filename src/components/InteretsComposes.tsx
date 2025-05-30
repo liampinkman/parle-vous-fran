@@ -1,7 +1,7 @@
 
 import { ChartLine } from "lucide-react";
 import { useInteretsComposes } from "@/hooks/useInteretsComposes";
-import { memo, useState } from "react";
+import { memo, useState, useMemo } from "react";
 import AdSpace from "@/components/AdSpace";
 import InteretsComposesForm from "@/components/interets-composes/InteretsComposesForm";
 import InteretsComposesTable from "@/components/interets-composes/InteretsComposesTable";
@@ -27,29 +27,44 @@ const InteretsComposes = memo((props: InteretsComposesProps) => {
   // Utiliser soit les props fournies, soit le hook local
   const hookValues = useInteretsComposes();
   
-  const {
-    montantInitial = props.montantInitial || hookValues.montantInitial,
-    setMontantInitial = props.setMontantInitial || hookValues.setMontantInitial,
-    versementsMensuels = props.versementsMensuels || hookValues.versementsMensuels,
-    setVersementsMensuels = props.setVersementsMensuels || hookValues.setVersementsMensuels,
-    tauxAnnuel = props.tauxAnnuel || hookValues.tauxAnnuel,
-    setTauxAnnuel = props.setTauxAnnuel || hookValues.setTauxAnnuel,
-    duree = props.duree || hookValues.duree,
-    setDuree = props.setDuree || hookValues.setDuree,
-    resultats = props.resultats || hookValues.resultats,
-    calculerInteretsComposes = props.calculerInteretsComposes || hookValues.calculerInteretsComposes,
-    getAnneesClesCalcul = props.getAnneesClesCalcul || hookValues.getAnneesClesCalcul,
-    formatMontantEuro = props.formatMontantEuro || hookValues.formatMontantEuro
-  } = props.calculerInteretsComposes ? props : hookValues;
+  // Optimisation : utiliser useMemo pour éviter les recalculs
+  const componentProps = useMemo(() => {
+    if (props.calculerInteretsComposes) {
+      return props;
+    }
+    return hookValues;
+  }, [props, hookValues]);
 
-  // Préparer les données pour le graphique
-  const chartData = resultats.map(resultat => ({
-    name: `Année ${resultat.annee}`,
-    annee: resultat.annee,
-    capital: resultat.capitalFinAnnee,
-    versements: resultat.versementsCumules,
-    interets: resultat.gainTotal,
-  }));
+  const {
+    montantInitial,
+    setMontantInitial,
+    versementsMensuels,
+    setVersementsMensuels,
+    tauxAnnuel,
+    setTauxAnnuel,
+    duree,
+    setDuree,
+    resultats,
+    calculerInteretsComposes,
+    getAnneesClesCalcul,
+    formatMontantEuro
+  } = componentProps;
+
+  // Préparer les données pour le graphique - optimisé avec useMemo
+  const chartData = useMemo(() => {
+    if (!resultats?.length) return [];
+    
+    return resultats.map(resultat => ({
+      name: `Année ${resultat.annee}`,
+      annee: resultat.annee,
+      capital: resultat.capitalFinAnnee,
+      versements: resultat.versementsCumules,
+      interets: resultat.gainTotal,
+    }));
+  }, [resultats]);
+
+  // Optimisation : mémoriser si on a des résultats
+  const hasResults = useMemo(() => resultats?.length > 0, [resultats?.length]);
 
   return (
     <div className="space-y-6 p-4">
@@ -65,14 +80,13 @@ const InteretsComposes = memo((props: InteretsComposesProps) => {
         calculerInteretsComposes={calculerInteretsComposes}
       />
 
-      {resultats.length > 0 && (
+      {hasResults && (
         <>
           <InteretsComposesTable 
             results={getAnneesClesCalcul()}
             formatMontantEuro={formatMontantEuro}
           />
 
-          {/* Publicité entre le tableau et le graphique - avec une marge plus importante */}
           <div className="my-8">
             <AdSpace position="bottom" />
           </div>

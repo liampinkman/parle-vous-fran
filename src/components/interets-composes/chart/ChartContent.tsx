@@ -12,22 +12,62 @@ import {
 import { ChartContainer } from "@/components/ui/chart";
 import { ChartDataItem } from "./chartConfig";
 import CustomTooltip from "./CustomTooltip";
+import { memo, useMemo } from "react";
 
 interface ChartContentProps {
   data: ChartDataItem[];
   formatMontantEuro: (montant: number) => string;
 }
 
-const ChartContent = ({ data, formatMontantEuro }: ChartContentProps) => {
-  console.log("ChartContent render:", {
-    dataLength: data?.length || 0,
-    dataSample: data?.slice(0, 2),
-    formatFunction: typeof formatMontantEuro
-  });
+const ChartContent = memo(({ data, formatMontantEuro }: ChartContentProps) => {
+  // Validation des données optimisée avec useMemo
+  const validData = useMemo(() => {
+    if (!data || !Array.isArray(data) || data.length === 0) {
+      return [];
+    }
 
-  // Validate data before rendering
-  if (!data || !Array.isArray(data) || data.length === 0) {
-    console.error("ChartContent: Invalid or empty data:", data);
+    return data.filter(item => {
+      return item && 
+        typeof item.annee === 'number' && 
+        typeof item.capital === 'number' && 
+        typeof item.versements === 'number' && 
+        typeof item.interets === 'number' &&
+        !isNaN(item.capital) &&
+        !isNaN(item.versements) &&
+        !isNaN(item.interets);
+    });
+  }, [data]);
+
+  // Formatage de l'axe Y optimisé avec useMemo
+  const yAxisFormatter = useMemo(() => {
+    return (value: number) => {
+      if (value >= 1000000) {
+        return `${(value / 1000000).toFixed(0)}M€`;
+      }
+      if (value >= 1000) {
+        return `${(value / 1000).toFixed(0)}k€`;
+      }
+      return `${value}€`;
+    };
+  }, []);
+
+  // Configuration du chart mise en cache
+  const chartContainerConfig = useMemo(() => ({
+    capital: {
+      label: "Capital total",
+      theme: { light: "#2563eb", dark: "#3b82f6" },
+    },
+    versements: {
+      label: "Versements cumulés",
+      theme: { light: "#9333ea", dark: "#a855f7" },
+    },
+    interets: {
+      label: "Intérêts générés",
+      theme: { light: "#16a34a", dark: "#22c55e" },
+    },
+  }), []);
+
+  if (!validData.length) {
     return (
       <div className="h-[280px] md:h-80 flex items-center justify-center text-gray-500">
         Aucune donnée à afficher
@@ -35,55 +75,18 @@ const ChartContent = ({ data, formatMontantEuro }: ChartContentProps) => {
     );
   }
 
-  // Validate each data item
-  const validData = data.filter(item => {
-    const isValid = item && 
-      typeof item.annee === 'number' && 
-      typeof item.capital === 'number' && 
-      typeof item.versements === 'number' && 
-      typeof item.interets === 'number' &&
-      !isNaN(item.capital) &&
-      !isNaN(item.versements) &&
-      !isNaN(item.interets);
-    
-    if (!isValid) {
-      console.error("Invalid data item:", item);
-    }
-    
-    return isValid;
-  });
-
-  if (validData.length === 0) {
-    console.error("No valid data items found");
-    return (
-      <div className="h-[280px] md:h-80 flex items-center justify-center text-gray-500">
-        Données invalides
-      </div>
-    );
-  }
-
-  console.log("Valid data for chart:", validData.length, "items");
-
   return (
     <ChartContainer
       className="h-[280px] md:h-80 overflow-visible"
-      config={{
-        capital: {
-          label: "Capital total",
-          theme: { light: "#2563eb", dark: "#3b82f6" },
-        },
-        versements: {
-          label: "Versements cumulés",
-          theme: { light: "#9333ea", dark: "#a855f7" },
-        },
-        interets: {
-          label: "Intérêts générés",
-          theme: { light: "#16a34a", dark: "#22c55e" },
-        },
-      }}
+      config={chartContainerConfig}
     >
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={validData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+        <LineChart 
+          data={validData} 
+          margin={{ top: 5, right: 10, left: 0, bottom: 5 }}
+          // Optimisations pour les performances
+          syncId="interetsComposesChart"
+        >
           <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
           <XAxis 
             dataKey="annee" 
@@ -91,19 +94,20 @@ const ChartContent = ({ data, formatMontantEuro }: ChartContentProps) => {
             tickFormatter={(value) => `A${value}`}
             interval={0}
             tick={{ fontSize: 10 }}
+            axisLine={{ stroke: '#e2e8f0' }}
+            tickLine={{ stroke: '#e2e8f0' }}
           />
           <YAxis 
-            tickFormatter={(value) => 
-              value >= 1000000 
-                ? `${(value / 1000000).toFixed(0)}M€` 
-                : value >= 1000 
-                  ? `${(value / 1000).toFixed(0)}k€` 
-                  : `${value}€`
-            }
+            tickFormatter={yAxisFormatter}
             tick={{ fontSize: 10 }}
             width={40}
+            axisLine={{ stroke: '#e2e8f0' }}
+            tickLine={{ stroke: '#e2e8f0' }}
           />
-          <Tooltip content={<CustomTooltip formatMontant={formatMontantEuro} />} />
+          <Tooltip 
+            content={<CustomTooltip formatMontant={formatMontantEuro} />} 
+            animationDuration={150}
+          />
           <Legend 
             wrapperStyle={{ fontSize: '10px' }}
             iconSize={8}
@@ -117,6 +121,8 @@ const ChartContent = ({ data, formatMontantEuro }: ChartContentProps) => {
             strokeWidth={2}
             dot={{ r: 3 }}
             activeDot={{ r: 5 }}
+            connectNulls={false}
+            animationDuration={300}
           />
           <Line
             name="Versements cumulés"
@@ -125,6 +131,8 @@ const ChartContent = ({ data, formatMontantEuro }: ChartContentProps) => {
             stroke="var(--color-versements)"
             strokeWidth={2}
             dot={{ r: 2 }}
+            connectNulls={false}
+            animationDuration={300}
           />
           <Line
             name="Intérêts générés"
@@ -133,11 +141,15 @@ const ChartContent = ({ data, formatMontantEuro }: ChartContentProps) => {
             stroke="var(--color-interets)"
             strokeWidth={2}
             dot={{ r: 2 }}
+            connectNulls={false}
+            animationDuration={300}
           />
         </LineChart>
       </ResponsiveContainer>
     </ChartContainer>
   );
-};
+});
+
+ChartContent.displayName = "ChartContent";
 
 export default ChartContent;

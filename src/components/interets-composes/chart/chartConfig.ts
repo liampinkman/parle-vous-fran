@@ -1,3 +1,4 @@
+
 export interface ChartDataItem {
   name: string;
   annee: number;
@@ -30,26 +31,47 @@ export const chartConfig = {
   },
 };
 
+// Cache pour éviter les recalculs
+const filterCache = new Map<string, ChartDataItem[]>();
+
 // Filter chart data to show key years (1, 5, 10, 15, etc.) for better readability
 export const filterChartData = (chartData: ChartDataItem[], duree: string): ChartDataItem[] => {
-  if (!chartData.length) return [];
+  if (!chartData?.length) return [];
   
-  // Filter the data to keep years 1, multiples of 5, and the final year
+  // Créer une clé de cache unique
+  const cacheKey = `${chartData.length}-${duree}-${chartData[0]?.annee}-${chartData[chartData.length - 1]?.annee}`;
+  
+  // Vérifier le cache d'abord
+  if (filterCache.has(cacheKey)) {
+    return filterCache.get(cacheKey)!;
+  }
+  
   const dureeTotale = parseInt(duree, 10);
+  if (isNaN(dureeTotale)) return chartData;
   
-  // Key years we want to display (1, 5, 10, 15, 20, 25, 30, 35)
-  const annesCles = [1, 5, 10, 15, 20, 25, 30, 35];
+  // Optimisation : créer un Set pour une recherche O(1)
+  const annesClesSet = new Set([1, 5, 10, 15, 20, 25, 30, 35, dureeTotale]);
   
-  return chartData.filter(item => 
-    annesCles.includes(item.annee) || // Key years
-    item.annee % 5 === 0 || // Other multiples of 5 (for completeness)
-    item.annee === dureeTotale // Final year
-  ).sort((a, b) => a.annee - b.annee); // Make sure data is sorted by year
+  const filtered = chartData.filter(item => 
+    annesClesSet.has(item.annee) || 
+    item.annee % 5 === 0
+  ).sort((a, b) => a.annee - b.annee);
+  
+  // Mettre en cache le résultat (limiter la taille du cache)
+  if (filterCache.size > 50) {
+    const firstKey = filterCache.keys().next().value;
+    filterCache.delete(firstKey);
+  }
+  filterCache.set(cacheKey, filtered);
+  
+  return filtered;
 };
 
 // Determine chart width based on data points and mobile status
 export const getChartWidth = (dataLength: number, isMobile: boolean): number => {
-  return isMobile 
-    ? Math.max(dataLength * 70, 320) // On mobile, at least 320px or 70px per data point
-    : Math.max(dataLength * 100, 100); // On desktop, at least 100px per point or 100%
+  // Utiliser des calculs plus simples et mis en cache
+  const baseWidth = isMobile ? 70 : 100;
+  const minWidth = isMobile ? 320 : 400;
+  
+  return Math.max(dataLength * baseWidth, minWidth);
 };
