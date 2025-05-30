@@ -27,9 +27,29 @@ const InteretsComposesChart = memo(({
   const [showLeftScroll, setShowLeftScroll] = useState(false);
   const [showRightScroll, setShowRightScroll] = useState(false);
 
+  // Debug logging
+  console.log("InteretsComposesChart render:", {
+    chartDataLength: chartData?.length || 0,
+    duree,
+    isMobile,
+    chartDataSample: chartData?.slice(0, 2)
+  });
+
   // Filter chart data to show key years
   const filteredChartData = useMemo(() => {
-    return filterChartData(chartData, duree);
+    if (!chartData || !Array.isArray(chartData)) {
+      console.log("Invalid chartData:", chartData);
+      return [];
+    }
+    
+    const filtered = filterChartData(chartData, duree);
+    console.log("Filtered chart data:", {
+      original: chartData.length,
+      filtered: filtered.length,
+      sample: filtered.slice(0, 2)
+    });
+    
+    return filtered;
   }, [chartData, duree]);
 
   // Function to check and update scroll indicators
@@ -64,12 +84,22 @@ const InteretsComposesChart = memo(({
     }
   };
 
-  if (filteredChartData.length === 0) {
+  // Early return with debug info if no data
+  if (!filteredChartData || filteredChartData.length === 0) {
+    console.log("No chart data to render");
     return null;
   }
 
   // Determine chart width based on data points and platform
   const chartWidth = getChartWidth(filteredChartData.length, isMobile);
+  
+  console.log("Chart width calculated:", chartWidth);
+
+  // Validate formatMontantEuro function
+  if (typeof formatMontantEuro !== 'function') {
+    console.error("formatMontantEuro is not a function:", formatMontantEuro);
+    return null;
+  }
 
   return (
     <div className="bg-white rounded-lg border p-4 h-auto relative">

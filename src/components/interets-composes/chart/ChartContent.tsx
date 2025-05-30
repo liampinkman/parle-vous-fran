@@ -19,6 +19,51 @@ interface ChartContentProps {
 }
 
 const ChartContent = ({ data, formatMontantEuro }: ChartContentProps) => {
+  console.log("ChartContent render:", {
+    dataLength: data?.length || 0,
+    dataSample: data?.slice(0, 2),
+    formatFunction: typeof formatMontantEuro
+  });
+
+  // Validate data before rendering
+  if (!data || !Array.isArray(data) || data.length === 0) {
+    console.error("ChartContent: Invalid or empty data:", data);
+    return (
+      <div className="h-[280px] md:h-80 flex items-center justify-center text-gray-500">
+        Aucune donnée à afficher
+      </div>
+    );
+  }
+
+  // Validate each data item
+  const validData = data.filter(item => {
+    const isValid = item && 
+      typeof item.annee === 'number' && 
+      typeof item.capital === 'number' && 
+      typeof item.versements === 'number' && 
+      typeof item.interets === 'number' &&
+      !isNaN(item.capital) &&
+      !isNaN(item.versements) &&
+      !isNaN(item.interets);
+    
+    if (!isValid) {
+      console.error("Invalid data item:", item);
+    }
+    
+    return isValid;
+  });
+
+  if (validData.length === 0) {
+    console.error("No valid data items found");
+    return (
+      <div className="h-[280px] md:h-80 flex items-center justify-center text-gray-500">
+        Données invalides
+      </div>
+    );
+  }
+
+  console.log("Valid data for chart:", validData.length, "items");
+
   return (
     <ChartContainer
       className="h-[280px] md:h-80 overflow-visible"
@@ -38,7 +83,7 @@ const ChartContent = ({ data, formatMontantEuro }: ChartContentProps) => {
       }}
     >
       <ResponsiveContainer width="100%" height="100%">
-        <LineChart data={data} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
+        <LineChart data={validData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#eee" />
           <XAxis 
             dataKey="annee" 
