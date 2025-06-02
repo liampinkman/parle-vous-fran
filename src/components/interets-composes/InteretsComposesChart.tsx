@@ -23,22 +23,53 @@ const InteretsComposesChart = memo(({
   const [showLeftScroll, setShowLeftScroll] = useState(false);
   const [showRightScroll, setShowRightScroll] = useState(false);
 
+  // Add defensive checks for props
+  if (!chartData || !Array.isArray(chartData) || typeof formatMontantEuro !== 'function') {
+    console.error("InteretsComposesChart: Invalid props", { chartData, formatMontantEuro });
+    return null;
+  }
+
   // Filter chart data to show key years - optimisé avec useMemo
   const filteredChartData = useMemo(() => {
-    if (!chartData || !Array.isArray(chartData)) {
+    try {
+      if (!chartData || !Array.isArray(chartData) || chartData.length === 0) {
+        return [];
+      }
+      
+      // Validate each data item before filtering
+      const validData = chartData.filter(item => {
+        return item && 
+          typeof item.annee === 'number' && 
+          typeof item.capital === 'number' && 
+          typeof item.versements === 'number' && 
+          typeof item.interets === 'number' &&
+          !isNaN(item.capital) &&
+          !isNaN(item.versements) &&
+          !isNaN(item.interets) &&
+          isFinite(item.capital) &&
+          isFinite(item.versements) &&
+          isFinite(item.interets);
+      });
+
+      return filterChartData(validData, duree);
+    } catch (error) {
+      console.error("Error filtering chart data:", error);
       return [];
     }
-    return filterChartData(chartData, duree);
   }, [chartData, duree]);
 
   // Optimisation de la fonction de vérification des indicateurs de scroll
   const checkScrollIndicators = useCallback(() => {
-    const element = chartScrollRef.current;
-    if (!element) return;
-    
-    const { scrollLeft, scrollWidth, clientWidth } = element;
-    setShowLeftScroll(scrollLeft > 0);
-    setShowRightScroll(Math.ceil(scrollLeft + clientWidth) < scrollWidth - 1);
+    try {
+      const element = chartScrollRef.current;
+      if (!element) return;
+      
+      const { scrollLeft, scrollWidth, clientWidth } = element;
+      setShowLeftScroll(scrollLeft > 0);
+      setShowRightScroll(Math.ceil(scrollLeft + clientWidth) < scrollWidth - 1);
+    } catch (error) {
+      console.error("Error checking scroll indicators:", error);
+    }
   }, []);
 
   // Check scroll indicators on load and when data changes - optimisé
@@ -51,32 +82,34 @@ const InteretsComposesChart = memo(({
 
   // Function to scroll the chart horizontally - optimisé avec useCallback
   const scrollChart = useCallback((direction: 'left' | 'right') => {
-    const element = chartScrollRef.current;
-    if (!element) return;
-    
-    const scrollAmount = element.clientWidth / 2;
-    element.scrollBy({
-      left: direction === 'left' ? -scrollAmount : scrollAmount,
-      behavior: 'smooth'
-    });
+    try {
+      const element = chartScrollRef.current;
+      if (!element) return;
+      
+      const scrollAmount = element.clientWidth / 2;
+      element.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    } catch (error) {
+      console.error("Error scrolling chart:", error);
+    }
   }, []);
 
-  // Early return if no data
-  if (!filteredChartData?.length) {
-    return null;
-  }
-
-  // Validate formatMontantEuro function
-  if (typeof formatMontantEuro !== 'function') {
-    console.error("formatMontantEuro is not a function");
+  // Early return if no valid data
+  if (!filteredChartData || !Array.isArray(filteredChartData) || filteredChartData.length === 0) {
     return null;
   }
 
   // Determine chart width based on data points and platform - mis en cache
-  const chartWidth = useMemo(() => 
-    getChartWidth(filteredChartData.length, isMobile), 
-    [filteredChartData.length, isMobile]
-  );
+  const chartWidth = useMemo(() => {
+    try {
+      return getChartWidth(filteredChartData.length, isMobile);
+    } catch (error) {
+      console.error("Error calculating chart width:", error);
+      return isMobile ? '100%' : '800px';
+    }
+  }, [filteredChartData.length, isMobile]);
 
   return (
     <div className="bg-white rounded-lg border p-4 h-auto relative">

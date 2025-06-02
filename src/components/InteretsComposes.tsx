@@ -50,21 +50,65 @@ const InteretsComposes = memo((props: InteretsComposesProps) => {
     formatMontantEuro
   } = componentProps;
 
+  // Add defensive checks
+  if (!formatMontantEuro || typeof formatMontantEuro !== 'function') {
+    console.error("InteretsComposes: formatMontantEuro is not a function");
+    return (
+      <div className="space-y-6 p-4">
+        <div className="text-red-500">Erreur de configuration du composant</div>
+      </div>
+    );
+  }
+
   // Préparer les données pour le graphique - optimisé avec useMemo
   const chartData = useMemo(() => {
-    if (!resultats?.length) return [];
-    
-    return resultats.map(resultat => ({
-      name: `Année ${resultat.annee}`,
-      annee: resultat.annee,
-      capital: resultat.capitalFinAnnee,
-      versements: resultat.versementsCumules,
-      interets: resultat.gainTotal,
-    }));
+    try {
+      if (!resultats || !Array.isArray(resultats) || resultats.length === 0) {
+        return [];
+      }
+      
+      return resultats
+        .filter(resultat => {
+          return resultat && 
+            typeof resultat.annee === 'number' &&
+            typeof resultat.capitalFinAnnee === 'number' &&
+            typeof resultat.versementsCumules === 'number' &&
+            typeof resultat.gainTotal === 'number' &&
+            !isNaN(resultat.capitalFinAnnee) &&
+            !isNaN(resultat.versementsCumules) &&
+            !isNaN(resultat.gainTotal) &&
+            isFinite(resultat.capitalFinAnnee) &&
+            isFinite(resultat.versementsCumules) &&
+            isFinite(resultat.gainTotal);
+        })
+        .map(resultat => ({
+          name: `Année ${resultat.annee}`,
+          annee: resultat.annee,
+          capital: resultat.capitalFinAnnee,
+          versements: resultat.versementsCumules,
+          interets: resultat.gainTotal,
+        }));
+    } catch (error) {
+      console.error("Error preparing chart data:", error);
+      return [];
+    }
   }, [resultats]);
 
   // Optimisation : mémoriser si on a des résultats
-  const hasResults = useMemo(() => resultats?.length > 0, [resultats?.length]);
+  const hasResults = useMemo(() => {
+    return resultats && Array.isArray(resultats) && resultats.length > 0;
+  }, [resultats]);
+
+  // Optimisation : mémoriser les années clés
+  const anneesCles = useMemo(() => {
+    try {
+      if (!hasResults || !getAnneesClesCalcul) return [];
+      return getAnneesClesCalcul();
+    } catch (error) {
+      console.error("Error getting années clés:", error);
+      return [];
+    }
+  }, [hasResults, getAnneesClesCalcul]);
 
   return (
     <div className="space-y-6 p-4">
@@ -83,7 +127,7 @@ const InteretsComposes = memo((props: InteretsComposesProps) => {
       {hasResults && (
         <>
           <InteretsComposesTable 
-            results={getAnneesClesCalcul()}
+            results={anneesCles}
             formatMontantEuro={formatMontantEuro}
           />
 
@@ -91,11 +135,13 @@ const InteretsComposes = memo((props: InteretsComposesProps) => {
             <AdSpace position="bottom" />
           </div>
 
-          <InteretsComposesChart 
-            chartData={chartData}
-            duree={duree}
-            formatMontantEuro={formatMontantEuro}
-          />
+          {chartData.length > 0 && (
+            <InteretsComposesChart 
+              chartData={chartData}
+              duree={duree}
+              formatMontantEuro={formatMontantEuro}
+            />
+          )}
 
           <InteretsComposesSummary
             montantInitial={montantInitial}
