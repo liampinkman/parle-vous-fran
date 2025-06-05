@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -38,6 +39,20 @@ const MentionsLegales = () => {
                 <strong>Vercel Inc.</strong><br />
                 340 S Lemon Ave #4133, Walnut, CA 91789, USA
               </p>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-semibold mb-3">Avertissement sur les calculs</h2>
+              <div className="bg-yellow-50 p-3 rounded-lg border-l-4 border-yellow-400">
+                <p className="text-sm">
+                  <strong>Les calculs fournis par ce site sont purement indicatifs</strong> et ne constituent pas des conseils financiers personnalisés. 
+                  Les résultats sont basés sur des formules mathématiques standards et des taux moyens du marché français en 2025.
+                </p>
+                <p className="text-xs mt-2 text-gray-600">
+                  <strong>Sources :</strong> Taux moyens BCE, HCSF, observatoires immobiliers nationaux, 
+                  barèmes fiscaux français 2025. Consultez un professionnel pour tout projet d'investissement.
+                </p>
+              </div>
             </section>
 
             <section>
