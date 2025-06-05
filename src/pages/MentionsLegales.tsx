@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -25,11 +24,10 @@ const MentionsLegales = () => {
             <section>
               <h2 className="text-xl font-semibold mb-3">Éditeur du site</h2>
               <p>
-                <strong>Nom :</strong> [Votre nom ou raison sociale]<br />
+                <strong>Nom :</strong> SHAHMAT<br />
                 <strong>Statut :</strong> Auto-entrepreneur<br />
-                <strong>SIRET :</strong> [À compléter]<br />
-                <strong>Adresse :</strong> [Votre adresse]<br />
-                <strong>Email :</strong> [Votre email de contact]
+                <strong>SIRET :</strong> 88216038500010<br />
+                <strong>Email :</strong> shahmat@mailo.com
               </p>
             </section>
 
