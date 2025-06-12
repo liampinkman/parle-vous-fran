@@ -6,6 +6,7 @@ import EmpruntCalculator from "@/components/EmpruntCalculator";
 import RentabiliteCalculator from "@/components/RentabiliteCalculator";
 import InteretsComposes from "@/components/InteretsComposes";
 import Faq from "@/components/Faq";
+import GeneralDisclaimer from "@/components/GeneralDisclaimer";
 import { Calculator, CircleDollarSign, TrendingUp, HelpCircle } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEmpruntCalculator } from "@/hooks/useEmpruntCalculator";
@@ -28,6 +29,8 @@ const TabsContainer = ({ refreshAds, trackCalculation }: TabsContainerProps) => 
   return (
     <Card className="card-financial">
       <CardContent className="p-3 pt-5 md:pt-6 md:p-6">
+        <GeneralDisclaimer />
+        
         <Tabs defaultValue="emprunt" value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="w-full grid sm:grid-cols-4 grid-cols-2 gap-1 mb-2">
             <TabsTrigger value="emprunt" className="flex items-center justify-center gap-1.5">
