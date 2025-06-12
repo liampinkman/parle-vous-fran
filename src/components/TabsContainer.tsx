@@ -29,8 +29,6 @@ const TabsContainer = ({ refreshAds, trackCalculation }: TabsContainerProps) => 
   return (
     <Card className="card-financial">
       <CardContent className="p-3 pt-5 md:pt-6 md:p-6">
-        <GeneralDisclaimer />
-        
         <Tabs defaultValue="emprunt" value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="w-full grid sm:grid-cols-4 grid-cols-2 gap-1 mb-2">
             <TabsTrigger value="emprunt" className="flex items-center justify-center gap-1.5">
@@ -108,6 +106,11 @@ const TabsContainer = ({ refreshAds, trackCalculation }: TabsContainerProps) => 
             <Faq />
           </TabsContent>
         </Tabs>
+        
+        {/* Déplacement de l'avertissement en bas de page */}
+        <div className="mt-6">
+          <GeneralDisclaimer />
+        </div>
       </CardContent>
     </Card>
   );
@@ -204,7 +207,6 @@ const InteretsComposesWithRefresh = memo(({ refreshAds, trackCalculation }: { re
   );
 });
 
-// Ajout des displayNames pour aider au debugging
 EmpruntCalculatorWithRefresh.displayName = "EmpruntCalculatorWithRefresh";
 RentabiliteCalculatorWithRefresh.displayName = "RentabiliteCalculatorWithRefresh";
 InteretsComposesWithRefresh.displayName = "InteretsComposesWithRefresh";
