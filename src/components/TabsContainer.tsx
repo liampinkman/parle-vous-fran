@@ -1,4 +1,3 @@
-
 import { useState, useCallback, memo } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,7 +5,6 @@ import EmpruntCalculator from "@/components/EmpruntCalculator";
 import RentabiliteCalculator from "@/components/RentabiliteCalculator";
 import InteretsComposes from "@/components/InteretsComposes";
 import Faq from "@/components/Faq";
-import GeneralDisclaimer from "@/components/GeneralDisclaimer";
 import { Calculator, CircleDollarSign, TrendingUp, HelpCircle } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useEmpruntCalculator } from "@/hooks/useEmpruntCalculator";
@@ -106,11 +104,6 @@ const TabsContainer = ({ refreshAds, trackCalculation }: TabsContainerProps) => 
             <Faq />
           </TabsContent>
         </Tabs>
-        
-        {/* Déplacement de l'avertissement en bas de page */}
-        <div className="mt-6">
-          <GeneralDisclaimer />
-        </div>
       </CardContent>
     </Card>
   );
