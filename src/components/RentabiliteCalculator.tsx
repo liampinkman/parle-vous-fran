@@ -36,29 +36,28 @@ interface RentabiliteCalculatorProps {
 }
 
 const RentabiliteCalculator = memo((props: RentabiliteCalculatorProps) => {
-  // Utiliser soit les props fournies, soit le hook local
+  // Always call the hook to maintain consistent hook order
   const hookValues = useRentabiliteCalculator();
   
-  const {
-    prixAchat = props.prixAchat || hookValues.prixAchat,
-    setPrixAchat = props.setPrixAchat || hookValues.setPrixAchat,
-    fraisNotaire = props.fraisNotaire || hookValues.fraisNotaire,
-    setFraisNotaire = props.setFraisNotaire || hookValues.setFraisNotaire,
-    loyerMensuel = props.loyerMensuel || hookValues.loyerMensuel,
-    setLoyerMensuel = props.setLoyerMensuel || hookValues.setLoyerMensuel,
-    chargesAnnuelles = props.chargesAnnuelles || hookValues.chargesAnnuelles,
-    setChargesAnnuelles = props.setChargesAnnuelles || hookValues.setChargesAnnuelles,
-    tauxImpot = props.tauxImpot || hookValues.tauxImpot,
-    setTauxImpot = props.setTauxImpot || hookValues.setTauxImpot,
-    apport = props.apport || hookValues.apport,
-    setApport = props.setApport || hookValues.setApport,
-    tauxCredit = props.tauxCredit || hookValues.tauxCredit,
-    setTauxCredit = props.setTauxCredit || hookValues.setTauxCredit,
-    dureeCredit = props.dureeCredit || hookValues.dureeCredit,
-    setDureeCredit = props.setDureeCredit || hookValues.setDureeCredit,
-    result = props.result || hookValues.result,
-    calculateRentabilite = props.calculateRentabilite || hookValues.calculateRentabilite
-  } = props.calculateRentabilite ? props : hookValues;
+  // Use props if provided, otherwise fall back to hook values
+  const prixAchat = props.prixAchat ?? hookValues.prixAchat;
+  const setPrixAchat = props.setPrixAchat ?? hookValues.setPrixAchat;
+  const fraisNotaire = props.fraisNotaire ?? hookValues.fraisNotaire;
+  const setFraisNotaire = props.setFraisNotaire ?? hookValues.setFraisNotaire;
+  const loyerMensuel = props.loyerMensuel ?? hookValues.loyerMensuel;
+  const setLoyerMensuel = props.setLoyerMensuel ?? hookValues.setLoyerMensuel;
+  const chargesAnnuelles = props.chargesAnnuelles ?? hookValues.chargesAnnuelles;
+  const setChargesAnnuelles = props.setChargesAnnuelles ?? hookValues.setChargesAnnuelles;
+  const tauxImpot = props.tauxImpot ?? hookValues.tauxImpot;
+  const setTauxImpot = props.setTauxImpot ?? hookValues.setTauxImpot;
+  const apport = props.apport ?? hookValues.apport;
+  const setApport = props.setApport ?? hookValues.setApport;
+  const tauxCredit = props.tauxCredit ?? hookValues.tauxCredit;
+  const setTauxCredit = props.setTauxCredit ?? hookValues.setTauxCredit;
+  const dureeCredit = props.dureeCredit ?? hookValues.dureeCredit;
+  const setDureeCredit = props.setDureeCredit ?? hookValues.setDureeCredit;
+  const result = props.result ?? hookValues.result;
+  const calculateRentabilite = props.calculateRentabilite ?? hookValues.calculateRentabilite;
   
   return (
     <div className="space-y-6 p-4">

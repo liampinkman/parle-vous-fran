@@ -1,3 +1,4 @@
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -31,21 +32,20 @@ interface EmpruntCalculatorProps {
 }
 
 const EmpruntCalculator = memo((props: EmpruntCalculatorProps) => {
-  // Utiliser soit les props fournies, soit le hook local
+  // Always call the hook to maintain consistent hook order
   const hookValues = useEmpruntCalculator();
   
-  const {
-    revenuMensuel = props.revenuMensuel || hookValues.revenuMensuel,
-    setRevenuMensuel = props.setRevenuMensuel || hookValues.setRevenuMensuel,
-    charges = props.charges || hookValues.charges,
-    setCharges = props.setCharges || hookValues.setCharges,
-    duree = props.duree || hookValues.duree,
-    setDuree = props.setDuree || hookValues.setDuree,
-    tauxInteret = props.tauxInteret || hookValues.tauxInteret,
-    setTauxInteret = props.setTauxInteret || hookValues.setTauxInteret,
-    result = props.result || hookValues.result,
-    calculateEmprunt = props.calculateEmprunt || hookValues.calculateEmprunt
-  } = props.calculateEmprunt ? props : hookValues;
+  // Use props if provided, otherwise fall back to hook values
+  const revenuMensuel = props.revenuMensuel ?? hookValues.revenuMensuel;
+  const setRevenuMensuel = props.setRevenuMensuel ?? hookValues.setRevenuMensuel;
+  const charges = props.charges ?? hookValues.charges;
+  const setCharges = props.setCharges ?? hookValues.setCharges;
+  const duree = props.duree ?? hookValues.duree;
+  const setDuree = props.setDuree ?? hookValues.setDuree;
+  const tauxInteret = props.tauxInteret ?? hookValues.tauxInteret;
+  const setTauxInteret = props.setTauxInteret ?? hookValues.setTauxInteret;
+  const result = props.result ?? hookValues.result;
+  const calculateEmprunt = props.calculateEmprunt ?? hookValues.calculateEmprunt;
 
   return (
     <div className="space-y-6 p-4">

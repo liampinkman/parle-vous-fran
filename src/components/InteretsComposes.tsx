@@ -24,31 +24,22 @@ interface InteretsComposesProps {
 }
 
 const InteretsComposes = memo((props: InteretsComposesProps) => {
-  // Utiliser soit les props fournies, soit le hook local
+  // Always call the hook to maintain consistent hook order
   const hookValues = useInteretsComposes();
   
-  // Optimisation : utiliser useMemo pour éviter les recalculs
-  const componentProps = useMemo(() => {
-    if (props.calculerInteretsComposes) {
-      return props;
-    }
-    return hookValues;
-  }, [props, hookValues]);
-
-  const {
-    montantInitial,
-    setMontantInitial,
-    versementsMensuels,
-    setVersementsMensuels,
-    tauxAnnuel,
-    setTauxAnnuel,
-    duree,
-    setDuree,
-    resultats,
-    calculerInteretsComposes,
-    getAnneesClesCalcul,
-    formatMontantEuro
-  } = componentProps;
+  // Use props if provided, otherwise fall back to hook values
+  const montantInitial = props.montantInitial ?? hookValues.montantInitial;
+  const setMontantInitial = props.setMontantInitial ?? hookValues.setMontantInitial;
+  const versementsMensuels = props.versementsMensuels ?? hookValues.versementsMensuels;
+  const setVersementsMensuels = props.setVersementsMensuels ?? hookValues.setVersementsMensuels;
+  const tauxAnnuel = props.tauxAnnuel ?? hookValues.tauxAnnuel;
+  const setTauxAnnuel = props.setTauxAnnuel ?? hookValues.setTauxAnnuel;
+  const duree = props.duree ?? hookValues.duree;
+  const setDuree = props.setDuree ?? hookValues.setDuree;
+  const resultats = props.resultats ?? hookValues.resultats;
+  const calculerInteretsComposes = props.calculerInteretsComposes ?? hookValues.calculerInteretsComposes;
+  const getAnneesClesCalcul = props.getAnneesClesCalcul ?? hookValues.getAnneesClesCalcul;
+  const formatMontantEuro = props.formatMontantEuro ?? hookValues.formatMontantEuro;
 
   // Préparer les données pour le graphique - optimisé avec useMemo
   const chartData = useMemo(() => {
