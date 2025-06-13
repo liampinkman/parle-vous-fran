@@ -6,8 +6,8 @@ import { componentTagger } from "lovable-tagger";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  // Configuration pour GitHub Pages - remplacez [VOTRE-REPO-NAME] par le nom de votre repo
-  base: mode === 'production' ? '/calculateur-investissement-immobilier/' : '/',
+  // Configuration pour GitHub Pages - repository "parle-vous-fran"
+  base: mode === 'production' ? '/parle-vous-fran/' : '/',
   
   server: {
     host: "::",
@@ -36,7 +36,7 @@ export default defineConfig(({ mode }) => ({
       output: {
         manualChunks: {
           'react-vendor': ['react', 'react-dom'],
-          'ui-vendor': ['@radix-ui/react-tabs', '@radix-ui/react-card'],
+          'ui-vendor': ['@radix-ui/react-tabs'],
           'chart-vendor': ['recharts'],
           'router-vendor': ['react-router-dom'],
         },
