@@ -1,73 +1,131 @@
-# Welcome to your Lovable project
 
-## Project info
+# Calculateur d'Investissement Immobilier
 
-**URL**: https://lovable.dev/projects/b888c178-5a91-438c-8f36-dd75c7057539
+Application web gratuite pour calculer la capacité d'emprunt, la rentabilité locative et les intérêts composés dans le cadre d'investissements immobiliers en France.
 
-## How can I edit this code?
+## 🚀 Fonctionnalités
 
-There are several ways of editing your application.
+- **Calculateur de capacité d'emprunt** : Basé sur les normes HCSF 2025
+- **Simulateur de rentabilité locative** : Calculs conformes à la fiscalité française
+- **Calculateur d'intérêts composés** : Projection d'investissements financiers
+- **Interface responsive** : Optimisée pour desktop et mobile
+- **Données actualisées** : Taux et réglementations 2025
 
-**Use Lovable**
+## 🛠️ Technologies
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b888c178-5a91-438c-8f36-dd75c7057539) and start prompting.
+- **Frontend** : React 18, TypeScript, Vite
+- **UI** : Tailwind CSS, Shadcn/UI, Radix UI
+- **Charts** : Recharts
+- **Routing** : React Router
+- **Query** : TanStack Query
+- **Build** : Vite avec optimisations de production
 
-Changes made via Lovable will be committed automatically to this repo.
+## 📦 Installation et développement
 
-**Use your preferred IDE**
+```bash
+# Installation des dépendances
+npm install
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Serveur de développement
 npm run dev
+
+# Build de production
+npm run build
+
+# Prévisualisation de la build
+npm run preview
 ```
 
-**Edit a file directly in GitHub**
+## 🌐 Déploiement
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### GitHub Pages (Automatique)
 
-**Use GitHub Codespaces**
+1. Forkez ce repository
+2. Activez GitHub Pages dans les paramètres du repository
+3. Les déploiements se font automatiquement via GitHub Actions
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Configuration requise
 
-## What technologies are used for this project?
+1. **Mise à jour du nom du repository** dans `vite.config.ts` :
+   ```typescript
+   base: mode === 'production' ? '/votre-nom-de-repo/' : '/',
+   ```
 
-This project is built with:
+2. **Google Analytics** (optionnel) :
+   - Créez une variable d'environnement `VITE_GA_MEASUREMENT_ID`
+   - Ou modifiez directement dans `src/config/environment.ts`
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Autres plateformes
 
-## How can I deploy this project?
+- **Netlify** : Connectez votre repository GitHub
+- **Vercel** : Import depuis GitHub avec build command `npm run build`
+- **Firebase Hosting** : `npm run build` puis `firebase deploy`
 
-Simply open [Lovable](https://lovable.dev/projects/b888c178-5a91-438c-8f36-dd75c7057539) and click on Share -> Publish.
+## 📁 Structure du projet
 
-## Can I connect a custom domain to my Lovable project?
+```
+src/
+├── components/          # Composants React
+├── hooks/              # Hooks personnalisés
+├── utils/              # Utilitaires et calculateurs
+├── config/             # Configuration (env, SEO)
+├── constants/          # Constantes et valeurs par défaut
+├── pages/              # Pages de l'application
+└── types/              # Types TypeScript
+```
 
-Yes, you can!
+## 🔧 Configuration
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+### Variables d'environnement
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+Créez un fichier `.env.local` pour le développement :
+
+```env
+VITE_GA_MEASUREMENT_ID=G-XXXXXXXXXX
+```
+
+### Personnalisation
+
+- **Couleurs et thème** : Modifiez `src/index.css` et `tailwind.config.ts`
+- **Valeurs par défaut** : Éditez `src/constants/calculators.ts`
+- **SEO** : Configurez `src/config/seo.ts`
+
+## 📊 Fonctionnalités techniques
+
+- **Lazy loading** des composants pour optimiser les performances
+- **Memoization** des calculs complexes
+- **Validation** robuste des entrées utilisateur
+- **Responsive design** avec Tailwind CSS
+- **Accessibilité** via Radix UI
+- **SEO optimisé** avec métadonnées structurées
+
+## 🚀 Optimisations de production
+
+- **Code splitting** automatique
+- **Tree shaking** pour réduire la taille du bundle
+- **Compression** des assets
+- **Mise en cache** optimisée
+- **Lazy loading** des images et composants
+
+## 📱 Support navigateurs
+
+- Chrome/Edge 88+
+- Firefox 85+
+- Safari 14+
+- Mobiles iOS/Android modernes
+
+## 📄 Licence
+
+Ce projet est sous licence MIT. Voir le fichier `LICENSE` pour plus de détails.
+
+## 🤝 Contribution
+
+Les contributions sont les bienvenues ! Ouvrez une issue ou soumettez une pull request.
+
+## 📞 Support
+
+Pour toute question ou problème, ouvrez une issue sur GitHub.
+
+---
+
+**Note importante** : Ce calculateur fournit des estimations à titre informatif. Consultez un professionnel pour tout projet d'investissement.
