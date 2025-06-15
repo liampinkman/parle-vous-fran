@@ -4,7 +4,7 @@ import { useAdRefresh } from "@/hooks/useAdRefresh";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useMobileOverlayAd } from "@/hooks/useMobileOverlayAd";
 import { ENV } from "@/config/environment";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 
 // Lazy loading des composants pour optimiser les performances
 const AdSpace = lazy(() => import("@/components/AdSpace"));
@@ -25,10 +25,15 @@ const LoadingSpinner = () => (
 const MainLayout = () => {
   const isMobile = useIsMobile();
   const { refreshKey, refreshAds, shouldDisplayAd } = useAdRefresh();
-  const { showOverlay, closeOverlay, trackOverlayInteraction } = useMobileOverlayAd();
+  const { showOverlay, closeOverlay, trackOverlayInteraction, triggerOverlayAfterCalculation, checkSessionStorage } = useMobileOverlayAd();
   
   // Utiliser la configuration centralisée pour Google Analytics
   const { trackCalculation } = useAnalytics(ENV.GA_MEASUREMENT_ID);
+
+  // Vérifier le sessionStorage au montage du composant
+  useEffect(() => {
+    checkSessionStorage();
+  }, [checkSessionStorage]);
 
   return (
     <div className="min-h-screen bg-secondary">
@@ -38,7 +43,11 @@ const MainLayout = () => {
             <div>
               <Suspense fallback={<LoadingSpinner />}>
                 <PageHeader />
-                <TabsContainer refreshAds={refreshAds} trackCalculation={trackCalculation} />
+                <TabsContainer 
+                  refreshAds={refreshAds} 
+                  trackCalculation={trackCalculation} 
+                  triggerMobileOverlay={triggerOverlayAfterCalculation}
+                />
 
                 {/* Publicité en bas uniquement si l'utilisateur n'est pas sur mobile ou si shouldDisplayAd retourne true */}
                 {(!isMobile || shouldDisplayAd("bottom")) && (

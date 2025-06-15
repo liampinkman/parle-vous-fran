@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { useIsMobile } from './use-mobile';
 
 export const useMobileOverlayAd = () => {
@@ -7,27 +7,32 @@ export const useMobileOverlayAd = () => {
   const [hasShownThisSession, setHasShownThisSession] = useState(false);
   const isMobile = useIsMobile();
 
-  useEffect(() => {
-    // Vérifier si l'overlay a déjà été montré dans cette session
+  // Vérifier si l'overlay a déjà été montré dans cette session au montage
+  const checkSessionStorage = useCallback(() => {
+    const overlayShown = sessionStorage.getItem('mobileOverlayShown');
+    if (overlayShown === 'true') {
+      setHasShownThisSession(true);
+    }
+  }, []);
+
+  // Fonction pour déclencher l'affichage de l'overlay après un calcul
+  const triggerOverlayAfterCalculation = useCallback(() => {
+    // Vérifier si on est sur mobile et si l'overlay n'a pas déjà été montré
+    if (!isMobile || hasShownThisSession) {
+      return;
+    }
+
+    // Vérifier le sessionStorage au cas où il aurait été mis à jour dans un autre onglet
     const overlayShown = sessionStorage.getItem('mobileOverlayShown');
     if (overlayShown === 'true') {
       setHasShownThisSession(true);
       return;
     }
 
-    // Ne montrer que sur mobile et si pas encore montré
-    if (!isMobile || hasShownThisSession) {
-      return;
-    }
-
-    // Timer pour afficher l'overlay après 30 secondes
-    const timer = setTimeout(() => {
-      setShowOverlay(true);
-      setHasShownThisSession(true);
-      sessionStorage.setItem('mobileOverlayShown', 'true');
-    }, 30000); // 30 secondes
-
-    return () => clearTimeout(timer);
+    // Afficher l'overlay
+    setShowOverlay(true);
+    setHasShownThisSession(true);
+    sessionStorage.setItem('mobileOverlayShown', 'true');
   }, [isMobile, hasShownThisSession]);
 
   const closeOverlay = useCallback(() => {
@@ -40,8 +45,10 @@ export const useMobileOverlayAd = () => {
   }, []);
 
   return {
-    showOverlay: showOverlay && isMobile && !hasShownThisSession,
+    showOverlay: showOverlay && isMobile,
     closeOverlay,
-    trackOverlayInteraction
+    trackOverlayInteraction,
+    triggerOverlayAfterCalculation,
+    checkSessionStorage
   };
 };
