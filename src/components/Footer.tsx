@@ -27,14 +27,35 @@ const Footer = () => {
             © 2025 Calculateur d'Investissement Immobilier. Tous droits réservés.
           </div>
           
-          <div className="flex items-center gap-4 text-sm">
+          <div className="flex flex-wrap items-center justify-center gap-2 md:gap-4 text-sm">
             <Link 
               to="/mentions-legales" 
               className="text-gray-600 hover:text-primary transition-colors"
             >
               Mentions légales
             </Link>
-            <Separator orientation="vertical" className="h-4" />
+            <Separator orientation="vertical" className="h-4 hidden md:block" />
+            <Link 
+              to="/politique-confidentialite" 
+              className="text-gray-600 hover:text-primary transition-colors"
+            >
+              Confidentialité
+            </Link>
+            <Separator orientation="vertical" className="h-4 hidden md:block" />
+            <Link 
+              to="/conditions-utilisation" 
+              className="text-gray-600 hover:text-primary transition-colors"
+            >
+              CGU
+            </Link>
+            <Separator orientation="vertical" className="h-4 hidden md:block" />
+            <Link 
+              to="/politique-cookies" 
+              className="text-gray-600 hover:text-primary transition-colors"
+            >
+              Cookies
+            </Link>
+            <Separator orientation="vertical" className="h-4 hidden md:block" />
             <button 
               onClick={() => {
                 // Réafficher la bannière de cookies
@@ -43,7 +64,7 @@ const Footer = () => {
               }}
               className="text-gray-600 hover:text-primary transition-colors"
             >
-              Gestion des cookies
+              Gérer les cookies
             </button>
           </div>
         </div>
