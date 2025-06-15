@@ -119,4 +119,14 @@
   .tab-active {
     @apply bg-primary text-white font-medium;
   }
+
+  /* Animations pour les push ads */
+  @keyframes progress {
+    from { width: 100%; }
+    to { width: 0%; }
+  }
+  
+  .push-ad-progress {
+    animation: progress 8s linear forwards;
+  }
 }
