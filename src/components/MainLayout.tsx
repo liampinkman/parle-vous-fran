@@ -2,6 +2,7 @@
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAdRefresh } from "@/hooks/useAdRefresh";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import { useMobileOverlayAd } from "@/hooks/useMobileOverlayAd";
 import { ENV } from "@/config/environment";
 import { lazy, Suspense } from "react";
 
@@ -12,6 +13,7 @@ const TabsContainer = lazy(() => import("@/components/TabsContainer"));
 const InformationalContent = lazy(() => import("@/components/InformationalContent"));
 const Footer = lazy(() => import("@/components/Footer"));
 const CookieBanner = lazy(() => import("@/components/CookieBanner"));
+const MobileOverlayAd = lazy(() => import("@/components/MobileOverlayAd"));
 
 // Composant de chargement simple
 const LoadingSpinner = () => (
@@ -23,6 +25,7 @@ const LoadingSpinner = () => (
 const MainLayout = () => {
   const isMobile = useIsMobile();
   const { refreshKey, refreshAds, shouldDisplayAd } = useAdRefresh();
+  const { showOverlay, closeOverlay, trackOverlayInteraction } = useMobileOverlayAd();
   
   // Utiliser la configuration centralisée pour Google Analytics
   const { trackCalculation } = useAnalytics(ENV.GA_MEASUREMENT_ID);
@@ -69,6 +72,16 @@ const MainLayout = () => {
         <Footer />
         <CookieBanner />
       </Suspense>
+
+      {/* Overlay Ad Mobile - affiché conditionnellement */}
+      {showOverlay && (
+        <Suspense fallback={null}>
+          <MobileOverlayAd 
+            onClose={closeOverlay} 
+            onTrackInteraction={trackOverlayInteraction}
+          />
+        </Suspense>
+      )}
     </div>
   );
 };
