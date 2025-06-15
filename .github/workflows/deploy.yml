@@ -41,12 +41,16 @@ jobs:
       env:
         NODE_ENV: production
         
-    - name: List build output
+    - name: Debug build output
       run: |
-        echo "Build output:"
-        ls -la dist/
-        echo "Index.html content:"
-        cat dist/index.html || echo "index.html not found"
+        echo "=== Build output structure ==="
+        find dist -type f -name "*.html" -o -name "*.js" -o -name "*.css" | head -20
+        echo "=== Index.html content ==="
+        cat dist/index.html | head -30
+        echo "=== Assets directory ==="
+        ls -la dist/assets/ | head -10
+        echo "=== Checking for main JS file ==="
+        find dist -name "*main*" -o -name "*index*" | grep -E "\.(js|ts)$"
         
     - name: Setup Pages
       uses: actions/configure-pages@v4

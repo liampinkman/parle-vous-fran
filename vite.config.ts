@@ -7,7 +7,10 @@ import { componentTagger } from "lovable-tagger";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
+  // Simplifions pour diagnostiquer le problème
   const base = isProduction ? '/parle-vous-fran/' : '/';
+  
+  console.log('Vite config - Mode:', mode, 'Base:', base);
   
   return {
     base,
@@ -31,7 +34,7 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: 'dist',
       assetsDir: 'assets',
-      sourcemap: false,
+      sourcemap: true, // Activons les sourcemaps pour debug
       minify: 'esbuild',
       target: 'es2015',
       rollupOptions: {

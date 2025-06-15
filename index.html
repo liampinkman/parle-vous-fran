@@ -46,13 +46,11 @@
     <link rel="preconnect" href="https://www.googletagmanager.com">
     <link rel="preconnect" href="https://www.google-analytics.com">
     
-    <!-- Favicon -->
-    <link rel="icon" href="./favicon.ico" type="image/x-icon">
-    
     <!-- Debug script pour GitHub Pages -->
     <script>
       console.log('Base URL:', document.baseURI);
       console.log('Current location:', window.location.href);
+      console.log('Environment BASE_URL:', import.meta?.env?.BASE_URL || 'not available');
     </script>
   </head>
   <body>
