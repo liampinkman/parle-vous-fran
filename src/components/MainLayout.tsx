@@ -3,6 +3,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useAdRefresh } from "@/hooks/useAdRefresh";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useMobileOverlayAd } from "@/hooks/useMobileOverlayAd";
+import { useInPagePushAds } from "@/hooks/useInPagePushAds";
 import { ENV } from "@/config/environment";
 import { lazy, Suspense, useEffect } from "react";
 
@@ -14,6 +15,7 @@ const InformationalContent = lazy(() => import("@/components/InformationalConten
 const Footer = lazy(() => import("@/components/Footer"));
 const CookieBanner = lazy(() => import("@/components/CookieBanner"));
 const MobileOverlayAd = lazy(() => import("@/components/MobileOverlayAd"));
+const InPagePushAd = lazy(() => import("@/components/InPagePushAd"));
 
 // Composant de chargement simple
 const LoadingSpinner = () => (
@@ -26,14 +28,28 @@ const MainLayout = () => {
   const isMobile = useIsMobile();
   const { refreshKey, refreshAds, shouldDisplayAd } = useAdRefresh();
   const { showOverlay, closeOverlay, trackOverlayInteraction, triggerOverlayAfterCalculation, checkSessionStorage } = useMobileOverlayAd();
+  const { showInPagePush, loadPropellerScript, triggerInPagePush, closeInPagePush } = useInPagePushAds();
   
   // Utiliser la configuration centralisée pour Google Analytics
   const { trackCalculation } = useAnalytics(ENV.GA_MEASUREMENT_ID);
 
-  // Vérifier le sessionStorage au montage du composant
+  // Initialisation au montage du composant
   useEffect(() => {
     checkSessionStorage();
-  }, [checkSessionStorage]);
+    loadPropellerScript();
+  }, [checkSessionStorage, loadPropellerScript]);
+
+  // Fonction pour gérer les calculs avec ads
+  const handleCalculationWithAds = (type: string) => {
+    refreshAds();
+    trackCalculation(type);
+    triggerOverlayAfterCalculation();
+    
+    // Déclencher In-Page Push Ad sur mobile après quelques calculs
+    if (isMobile) {
+      triggerInPagePush();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-secondary">
@@ -45,7 +61,7 @@ const MainLayout = () => {
                 <PageHeader />
                 <TabsContainer 
                   refreshAds={refreshAds} 
-                  trackCalculation={trackCalculation} 
+                  trackCalculation={handleCalculationWithAds} 
                   triggerMobileOverlay={triggerOverlayAfterCalculation}
                 />
 
@@ -89,6 +105,13 @@ const MainLayout = () => {
             onClose={closeOverlay} 
             onTrackInteraction={trackOverlayInteraction}
           />
+        </Suspense>
+      )}
+
+      {/* In-Page Push Ad - affiché conditionnellement sur mobile */}
+      {showInPagePush && (
+        <Suspense fallback={null}>
+          <InPagePushAd onClose={closeInPagePush} />
         </Suspense>
       )}
     </div>
