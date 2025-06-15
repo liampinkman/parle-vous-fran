@@ -7,13 +7,11 @@ on:
   pull_request:
     branches: [ main ]
 
-# Permissions nécessaires pour déployer sur GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Éviter les déploiements concurrents
 concurrency:
   group: "pages"
   cancel-in-progress: false
@@ -43,6 +41,16 @@ jobs:
       env:
         NODE_ENV: production
         
+    - name: List build output
+      run: |
+        echo "Build output:"
+        ls -la dist/
+        echo "Index.html content:"
+        cat dist/index.html || echo "index.html not found"
+        
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+      
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
