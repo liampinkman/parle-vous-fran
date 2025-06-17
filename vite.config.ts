@@ -7,8 +7,8 @@ import { componentTagger } from "lovable-tagger";
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
-  // Simplifions pour diagnostiquer le problème
-  const base = isProduction ? '/parle-vous-fran/' : '/';
+  // Pour un domaine personnalisé, on utilise '/' comme base
+  const base = '/';
   
   console.log('Vite config - Mode:', mode, 'Base:', base);
   

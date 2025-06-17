@@ -2,8 +2,9 @@
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAdRefresh } from "@/hooks/useAdRefresh";
 import { useAnalytics } from "@/hooks/useAnalytics";
+import { useMobileOverlayAd } from "@/hooks/useMobileOverlayAd";
 import { ENV } from "@/config/environment";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 
 // Lazy loading des composants pour optimiser les performances
 const AdSpace = lazy(() => import("@/components/AdSpace"));
@@ -12,6 +13,7 @@ const TabsContainer = lazy(() => import("@/components/TabsContainer"));
 const InformationalContent = lazy(() => import("@/components/InformationalContent"));
 const Footer = lazy(() => import("@/components/Footer"));
 const CookieBanner = lazy(() => import("@/components/CookieBanner"));
+const MobileOverlayAd = lazy(() => import("@/components/MobileOverlayAd"));
 
 // Composant de chargement simple
 const LoadingSpinner = () => (
@@ -23,9 +25,15 @@ const LoadingSpinner = () => (
 const MainLayout = () => {
   const isMobile = useIsMobile();
   const { refreshKey, refreshAds, shouldDisplayAd } = useAdRefresh();
+  const { showOverlay, closeOverlay, trackOverlayInteraction, triggerOverlayAfterCalculation, checkSessionStorage } = useMobileOverlayAd();
   
   // Utiliser la configuration centralisée pour Google Analytics
   const { trackCalculation } = useAnalytics(ENV.GA_MEASUREMENT_ID);
+
+  // Vérifier le sessionStorage au montage du composant
+  useEffect(() => {
+    checkSessionStorage();
+  }, [checkSessionStorage]);
 
   return (
     <div className="min-h-screen bg-secondary">
@@ -35,7 +43,11 @@ const MainLayout = () => {
             <div>
               <Suspense fallback={<LoadingSpinner />}>
                 <PageHeader />
-                <TabsContainer refreshAds={refreshAds} trackCalculation={trackCalculation} />
+                <TabsContainer 
+                  refreshAds={refreshAds} 
+                  trackCalculation={trackCalculation} 
+                  triggerMobileOverlay={triggerOverlayAfterCalculation}
+                />
 
                 {/* Publicité en bas uniquement si l'utilisateur n'est pas sur mobile ou si shouldDisplayAd retourne true */}
                 {(!isMobile || shouldDisplayAd("bottom")) && (
@@ -69,6 +81,16 @@ const MainLayout = () => {
         <Footer />
         <CookieBanner />
       </Suspense>
+
+      {/* Overlay Ad Mobile - affiché conditionnellement */}
+      {showOverlay && (
+        <Suspense fallback={null}>
+          <MobileOverlayAd 
+            onClose={closeOverlay} 
+            onTrackInteraction={trackOverlayInteraction}
+          />
+        </Suspense>
+      )}
     </div>
   );
 };

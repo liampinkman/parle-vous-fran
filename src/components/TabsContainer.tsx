@@ -1,4 +1,5 @@
-import { useState, useCallback, memo } from "react";
+
+import { useState, useCallback, memo, useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import EmpruntCalculator from "@/components/EmpruntCalculator";
@@ -14,9 +15,10 @@ import { useInteretsComposes } from "@/hooks/useInteretsComposes";
 interface TabsContainerProps {
   refreshAds: () => void;
   trackCalculation: (type: string) => void;
+  triggerMobileOverlay?: () => void;
 }
 
-const TabsContainer = ({ refreshAds, trackCalculation }: TabsContainerProps) => {
+const TabsContainer = ({ refreshAds, trackCalculation, triggerMobileOverlay }: TabsContainerProps) => {
   const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState("emprunt");
   
@@ -58,7 +60,7 @@ const TabsContainer = ({ refreshAds, trackCalculation }: TabsContainerProps) => 
                 </p>
               </div>
             )}
-            <EmpruntCalculatorWithRefresh refreshAds={refreshAds} trackCalculation={trackCalculation} />
+            <EmpruntCalculatorWithRefresh refreshAds={refreshAds} trackCalculation={trackCalculation} triggerMobileOverlay={triggerMobileOverlay} />
           </TabsContent>
           
           <TabsContent value="rentabilite">
@@ -73,7 +75,7 @@ const TabsContainer = ({ refreshAds, trackCalculation }: TabsContainerProps) => 
                 </p>
               </div>
             )}
-            <RentabiliteCalculatorWithRefresh refreshAds={refreshAds} trackCalculation={trackCalculation} />
+            <RentabiliteCalculatorWithRefresh refreshAds={refreshAds} trackCalculation={trackCalculation} triggerMobileOverlay={triggerMobileOverlay} />
           </TabsContent>
           
           <TabsContent value="interets">
@@ -88,7 +90,7 @@ const TabsContainer = ({ refreshAds, trackCalculation }: TabsContainerProps) => 
                 </p>
               </div>
             )}
-            <InteretsComposesWithRefresh refreshAds={refreshAds} trackCalculation={trackCalculation} />
+            <InteretsComposesWithRefresh refreshAds={refreshAds} trackCalculation={trackCalculation} triggerMobileOverlay={triggerMobileOverlay} />
           </TabsContent>
           
           <TabsContent value="faq">
@@ -110,7 +112,7 @@ const TabsContainer = ({ refreshAds, trackCalculation }: TabsContainerProps) => 
 };
 
 // Composants optimisés avec memo pour éviter les re-rendus inutiles
-const EmpruntCalculatorWithRefresh = memo(({ refreshAds, trackCalculation }: { refreshAds: () => void; trackCalculation: (type: string) => void }) => {
+const EmpruntCalculatorWithRefresh = memo(({ refreshAds, trackCalculation, triggerMobileOverlay }: { refreshAds: () => void; trackCalculation: (type: string) => void; triggerMobileOverlay?: () => void }) => {
   const { revenuMensuel, setRevenuMensuel, charges, setCharges, duree, setDuree, 
           tauxInteret, setTauxInteret, result, calculateEmprunt } = useEmpruntCalculator();
 
@@ -118,7 +120,8 @@ const EmpruntCalculatorWithRefresh = memo(({ refreshAds, trackCalculation }: { r
     calculateEmprunt();
     refreshAds();
     trackCalculation('emprunt');
-  }, [calculateEmprunt, refreshAds, trackCalculation]);
+    triggerMobileOverlay?.();
+  }, [calculateEmprunt, refreshAds, trackCalculation, triggerMobileOverlay]);
 
   return (
     <EmpruntCalculator
@@ -136,7 +139,7 @@ const EmpruntCalculatorWithRefresh = memo(({ refreshAds, trackCalculation }: { r
   );
 });
 
-const RentabiliteCalculatorWithRefresh = memo(({ refreshAds, trackCalculation }: { refreshAds: () => void; trackCalculation: (type: string) => void }) => {
+const RentabiliteCalculatorWithRefresh = memo(({ refreshAds, trackCalculation, triggerMobileOverlay }: { refreshAds: () => void; trackCalculation: (type: string) => void; triggerMobileOverlay?: () => void }) => {
   const { prixAchat, setPrixAchat, fraisNotaire, setFraisNotaire, loyerMensuel, setLoyerMensuel,
           chargesAnnuelles, setChargesAnnuelles, tauxImpot, setTauxImpot, apport, setApport,
           tauxCredit, setTauxCredit, dureeCredit, setDureeCredit, result, calculateRentabilite } = useRentabiliteCalculator();
@@ -145,7 +148,8 @@ const RentabiliteCalculatorWithRefresh = memo(({ refreshAds, trackCalculation }:
     calculateRentabilite();
     refreshAds();
     trackCalculation('rentabilite');
-  }, [calculateRentabilite, refreshAds, trackCalculation]);
+    triggerMobileOverlay?.();
+  }, [calculateRentabilite, refreshAds, trackCalculation, triggerMobileOverlay]);
 
   return (
     <RentabiliteCalculator
@@ -171,7 +175,7 @@ const RentabiliteCalculatorWithRefresh = memo(({ refreshAds, trackCalculation }:
   );
 });
 
-const InteretsComposesWithRefresh = memo(({ refreshAds, trackCalculation }: { refreshAds: () => void; trackCalculation: (type: string) => void }) => {
+const InteretsComposesWithRefresh = memo(({ refreshAds, trackCalculation, triggerMobileOverlay }: { refreshAds: () => void; trackCalculation: (type: string) => void; triggerMobileOverlay?: () => void }) => {
   const { montantInitial, setMontantInitial, versementsMensuels, setVersementsMensuels,
           tauxAnnuel, setTauxAnnuel, duree, setDuree, resultats, calculerInteretsComposes,
           getAnneesClesCalcul, formatMontantEuro } = useInteretsComposes();
@@ -180,7 +184,8 @@ const InteretsComposesWithRefresh = memo(({ refreshAds, trackCalculation }: { re
     calculerInteretsComposes();
     refreshAds();
     trackCalculation('interets_composes');
-  }, [calculerInteretsComposes, refreshAds, trackCalculation]);
+    triggerMobileOverlay?.();
+  }, [calculerInteretsComposes, refreshAds, trackCalculation, triggerMobileOverlay]);
 
   return (
     <InteretsComposes
