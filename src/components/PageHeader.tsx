@@ -7,8 +7,8 @@ const PageHeader = () => {
 
   return (
     <div>
-      <h1 className="text-2xl md:text-3xl font-bold mb-3 md:mb-4 text-primary flex items-center gap-2">
-        <CircleDollarSign size={isMobile ? 24 : 28} />
+      <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 text-primary flex items-center gap-3">
+        <CircleDollarSign size={isMobile ? 32 : 40} />
         Calculateur d'Investissement Immobilier
       </h1>
       
