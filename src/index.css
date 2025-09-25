@@ -6,18 +6,18 @@
 @layer base {
   :root {
     /* Charte graphique financière professionnelle */
-    --background: 250 250 250;
-    --foreground: 210 15% 15%;
+    --background: 220 15% 98%;
+    --foreground: 220 15% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 210 15% 15%;
+    --card-foreground: 220 15% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 210 15% 15%;
+    --popover-foreground: 220 15% 15%;
 
     /* Bleu foncé professionnel comme couleur principale */
     --primary: 220 45% 25%;
-    --primary-foreground: 210 40% 98%;
+    --primary-foreground: 0 0% 98%;
     --primary-light: 220 45% 35%;
     --primary-dark: 220 55% 15%;
 
@@ -29,14 +29,14 @@
     --muted: 220 13% 96%;
     --muted-foreground: 220 10% 45%;
 
-    /* Vert financier pour les accents positifs */
-    --accent: 145 65% 42%;
+    /* Bleu-vert sophistiqué pour les accents */
+    --accent: 200 45% 45%;
     --accent-foreground: 0 0% 100%;
-    --accent-light: 145 50% 55%;
+    --accent-light: 200 40% 55%;
 
     /* Rouge professionnel pour les alertes */
     --destructive: 0 65% 51%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
 
     /* Bordures subtiles et élégantes */
     --border: 220 13% 91%;
@@ -44,14 +44,14 @@
     --ring: 220 45% 25%;
 
     /* Success et warning pour les finances */
-    --success: 145 65% 42%;
+    --success: 150 60% 35%;
     --success-foreground: 0 0% 100%;
-    --warning: 45 93% 47%;
-    --warning-foreground: 45 30% 15%;
+    --warning: 35 85% 50%;
+    --warning-foreground: 35 30% 15%;
 
     /* Gradients professionnels */
     --gradient-primary: linear-gradient(135deg, hsl(220 45% 25%), hsl(220 45% 35%));
-    --gradient-accent: linear-gradient(135deg, hsl(145 65% 42%), hsl(145 50% 55%));
+    --gradient-accent: linear-gradient(135deg, hsl(200 45% 45%), hsl(200 40% 55%));
     --gradient-subtle: linear-gradient(180deg, hsl(220 15% 98%), hsl(220 13% 96%));
 
     /* Ombres élégantes */
