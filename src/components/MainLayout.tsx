@@ -8,6 +8,7 @@ import { lazy, Suspense, useEffect } from "react";
 
 // Lazy loading des composants pour optimiser les performances
 const AdSpace = lazy(() => import("@/components/AdSpace"));
+const Header = lazy(() => import("@/components/Header"));
 const PageHeader = lazy(() => import("@/components/PageHeader"));
 const TabsContainer = lazy(() => import("@/components/TabsContainer"));
 const InformationalContent = lazy(() => import("@/components/InformationalContent"));
@@ -36,14 +37,19 @@ const MainLayout = () => {
   }, [checkSessionStorage]);
 
   return (
-    <div className="min-h-screen bg-secondary">
+    <div className="min-h-screen bg-background">
+      {/* Header principal professionnel */}
+      <Suspense fallback={<LoadingSpinner />}>
+        <Header />
+      </Suspense>
+
       <div className="p-3 pb-6 md:p-6">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-4 md:gap-6">
             <div>
               <Suspense fallback={<LoadingSpinner />}>
                 <PageHeader />
-                <TabsContainer 
+                <TabsContainer
                   refreshAds={refreshAds} 
                   trackCalculation={trackCalculation} 
                   triggerMobileOverlay={triggerOverlayAfterCalculation}
