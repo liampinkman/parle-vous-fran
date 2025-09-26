@@ -9,21 +9,21 @@ const PageHeader = () => {
     <div className="bg-gradient-subtle rounded-xl p-6 md:p-8 mb-6 shadow-card fade-in">
       {/* Section outils disponibles */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="text-center p-3 rounded-lg bg-card shadow-card">
-          <Calculator className="mx-auto mb-2 text-primary" size={isMobile ? 20 : 24} />
-          <p className="text-xs md:text-sm font-medium text-foreground">Capacité Emprunt</p>
+        <div className="text-center p-4 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 shadow-card hover:shadow-card-hover transition-all duration-300 hover:scale-105 cursor-pointer border border-primary/20 hover:border-primary/40">
+          <Calculator className="mx-auto mb-3 text-primary drop-shadow-sm" size={isMobile ? 24 : 28} />
+          <p className="text-xs md:text-sm font-semibold text-primary">Capacité Emprunt</p>
         </div>
-        <div className="text-center p-3 rounded-lg bg-card shadow-card">
-          <TrendingUp className="mx-auto mb-2 text-accent" size={isMobile ? 20 : 24} />
-          <p className="text-xs md:text-sm font-medium text-foreground">Rentabilité</p>
+        <div className="text-center p-4 rounded-xl bg-gradient-to-br from-accent/10 to-accent/5 shadow-card hover:shadow-card-hover transition-all duration-300 hover:scale-105 cursor-pointer border border-accent/20 hover:border-accent/40">
+          <TrendingUp className="mx-auto mb-3 text-accent drop-shadow-sm" size={isMobile ? 24 : 28} />
+          <p className="text-xs md:text-sm font-semibold text-accent">Rentabilité</p>
         </div>
-        <div className="text-center p-3 rounded-lg bg-card shadow-card">
-          <Target className="mx-auto mb-2 text-primary" size={isMobile ? 20 : 24} />
-          <p className="text-xs md:text-sm font-medium text-foreground">Simulation</p>
+        <div className="text-center p-4 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 shadow-card hover:shadow-card-hover transition-all duration-300 hover:scale-105 cursor-pointer border border-primary/20 hover:border-primary/40">
+          <Target className="mx-auto mb-3 text-primary drop-shadow-sm" size={isMobile ? 24 : 28} />
+          <p className="text-xs md:text-sm font-semibold text-primary">Simulation</p>
         </div>
-        <div className="text-center p-3 rounded-lg bg-card shadow-card">
-          <BarChart3 className="mx-auto mb-2 text-accent" size={isMobile ? 20 : 24} />
-          <p className="text-xs md:text-sm font-medium text-foreground">Intérêts Composés</p>
+        <div className="text-center p-4 rounded-xl bg-gradient-to-br from-accent/10 to-accent/5 shadow-card hover:shadow-card-hover transition-all duration-300 hover:scale-105 cursor-pointer border border-accent/20 hover:border-accent/40">
+          <BarChart3 className="mx-auto mb-3 text-accent drop-shadow-sm" size={isMobile ? 24 : 28} />
+          <p className="text-xs md:text-sm font-semibold text-accent">Intérêts Composés</p>
         </div>
       </div>
 
