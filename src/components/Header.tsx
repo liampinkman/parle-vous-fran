@@ -1,5 +1,6 @@
 import { Building2, TrendingUp, Calculator, Shield } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const isMobile = useIsMobile();
@@ -28,18 +29,18 @@ const Header = () => {
           {/* Navigation principale - Desktop */}
           {!isMobile && (
             <nav className="header-nav">
-              <a href="#calculateurs" className="flex items-center gap-2">
+              <Link to="/calculateurs" className="flex items-center gap-2">
                 <Calculator size={16} />
                 Calculateurs
-              </a>
-              <a href="#conseils" className="flex items-center gap-2">
+              </Link>
+              <Link to="/conseils" className="flex items-center gap-2">
                 <Shield size={16} />
                 Conseils
-              </a>
-              <a href="#contact" className="flex items-center gap-2">
+              </Link>
+              <Link to="/expertise" className="flex items-center gap-2">
                 <TrendingUp size={16} />
                 Expertise
-              </a>
+              </Link>
             </nav>
           )}
         </div>

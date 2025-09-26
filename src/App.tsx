@@ -5,6 +5,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HashRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import Calculateurs from "./pages/Calculateurs";
+import Conseils from "./pages/Conseils";
+import Expertise from "./pages/Expertise";
 import MentionsLegales from "./pages/MentionsLegales";
 import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
 import ConditionsUtilisation from "./pages/ConditionsUtilisation";
@@ -26,6 +29,9 @@ const App = () => {
         <HashRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/calculateurs" element={<Calculateurs />} />
+            <Route path="/conseils" element={<Conseils />} />
+            <Route path="/expertise" element={<Expertise />} />
             <Route path="/mentions-legales" element={<MentionsLegales />} />
             <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
             <Route path="/conditions-utilisation" element={<ConditionsUtilisation />} />
