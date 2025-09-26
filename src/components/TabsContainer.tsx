@@ -16,15 +16,16 @@ interface TabsContainerProps {
   refreshAds: () => void;
   trackCalculation: (type: string) => void;
   triggerMobileOverlay?: () => void;
+  activeTab: string;
+  onTabChange: (value: string) => void;
 }
 
-const TabsContainer = ({ refreshAds, trackCalculation, triggerMobileOverlay }: TabsContainerProps) => {
+const TabsContainer = ({ refreshAds, trackCalculation, triggerMobileOverlay, activeTab, onTabChange }: TabsContainerProps) => {
   const isMobile = useIsMobile();
-  const [activeTab, setActiveTab] = useState("emprunt");
   
   const handleTabChange = useCallback((value: string) => {
-    setActiveTab(value);
-  }, []);
+    onTabChange(value);
+  }, [onTabChange]);
 
   return (
     <Card className="card-financial">

@@ -4,7 +4,7 @@ import { useAdRefresh } from "@/hooks/useAdRefresh";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useMobileOverlayAd } from "@/hooks/useMobileOverlayAd";
 import { ENV } from "@/config/environment";
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, useState, useCallback } from "react";
 
 // Lazy loading des composants pour optimiser les performances
 const AdSpace = lazy(() => import("@/components/AdSpace"));
@@ -28,6 +28,14 @@ const MainLayout = () => {
   const { refreshKey, refreshAds, shouldDisplayAd } = useAdRefresh();
   const { showOverlay, closeOverlay, trackOverlayInteraction, triggerOverlayAfterCalculation, checkSessionStorage } = useMobileOverlayAd();
   
+  // État pour gérer l'onglet actif
+  const [activeTab, setActiveTab] = useState("emprunt");
+  
+  // Fonction pour changer l'onglet depuis PageHeader
+  const handleTabChange = useCallback((tabValue: string) => {
+    setActiveTab(tabValue);
+  }, []);
+  
   // Utiliser la configuration centralisée pour Google Analytics
   const { trackCalculation } = useAnalytics(ENV.GA_MEASUREMENT_ID);
 
@@ -48,8 +56,10 @@ const MainLayout = () => {
           <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-4 md:gap-6">
             <div>
               <Suspense fallback={<LoadingSpinner />}>
-                <PageHeader />
+                <PageHeader onTabChange={handleTabChange} />
                 <TabsContainer
+                  activeTab={activeTab}
+                  onTabChange={setActiveTab}
                   refreshAds={refreshAds} 
                   trackCalculation={trackCalculation} 
                   triggerMobileOverlay={triggerOverlayAfterCalculation}
