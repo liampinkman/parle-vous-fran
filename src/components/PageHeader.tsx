@@ -1,5 +1,5 @@
 
-import { Calculator, TrendingUp, Target, BarChart3 } from "lucide-react";
+import { Calculator, CircleDollarSign, TrendingUp, HelpCircle } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PageHeaderProps {
@@ -18,25 +18,28 @@ const PageHeader = ({ onTabChange }: PageHeaderProps) => {
           onClick={() => onTabChange("emprunt")}
         >
           <Calculator className="mx-auto mb-3 text-primary drop-shadow-sm" size={isMobile ? 24 : 28} />
-          <p className="text-xs md:text-sm font-semibold text-primary">Capacité Emprunt</p>
+          <p className="text-xs md:text-sm font-semibold text-primary">Emprunt</p>
         </div>
         <div 
           className="text-center p-4 rounded-xl bg-gradient-to-br from-accent/10 to-accent/5 shadow-card hover:shadow-card-hover transition-all duration-300 hover:scale-105 cursor-pointer border border-accent/20 hover:border-accent/40"
           onClick={() => onTabChange("rentabilite")}
         >
-          <TrendingUp className="mx-auto mb-3 text-accent drop-shadow-sm" size={isMobile ? 24 : 28} />
-          <p className="text-xs md:text-sm font-semibold text-accent">Rentabilité</p>
+          <CircleDollarSign className="mx-auto mb-3 text-accent drop-shadow-sm" size={isMobile ? 24 : 28} />
+          <p className="text-xs md:text-sm font-semibold text-accent">Rentabilité locative</p>
         </div>
-        <div className="text-center p-4 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 shadow-card hover:shadow-card-hover transition-all duration-300 hover:scale-105 cursor-pointer border border-primary/20 hover:border-primary/40">
-          <Target className="mx-auto mb-3 text-primary drop-shadow-sm" size={isMobile ? 24 : 28} />
-          <p className="text-xs md:text-sm font-semibold text-primary">Simulation</p>
+        <div 
+          className="text-center p-4 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 shadow-card hover:shadow-card-hover transition-all duration-300 hover:scale-105 cursor-pointer border border-primary/20 hover:border-primary/40"
+          onClick={() => onTabChange("interets")}
+        >
+          <TrendingUp className="mx-auto mb-3 text-primary drop-shadow-sm" size={isMobile ? 24 : 28} />
+          <p className="text-xs md:text-sm font-semibold text-primary">Intérêts composés</p>
         </div>
         <div 
           className="text-center p-4 rounded-xl bg-gradient-to-br from-accent/10 to-accent/5 shadow-card hover:shadow-card-hover transition-all duration-300 hover:scale-105 cursor-pointer border border-accent/20 hover:border-accent/40"
-          onClick={() => onTabChange("interets")}
+          onClick={() => onTabChange("faq")}
         >
-          <BarChart3 className="mx-auto mb-3 text-accent drop-shadow-sm" size={isMobile ? 24 : 28} />
-          <p className="text-xs md:text-sm font-semibold text-accent">Intérêts Composés</p>
+          <HelpCircle className="mx-auto mb-3 text-accent drop-shadow-sm" size={isMobile ? 24 : 28} />
+          <p className="text-xs md:text-sm font-semibold text-accent">FAQ</p>
         </div>
       </div>
 
