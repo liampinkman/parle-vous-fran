@@ -13,28 +13,28 @@ const Calculateurs = () => {
       title: "Capacité d'Emprunt",
       description: "Calculez votre capacité d'emprunt maximale selon vos revenus et charges",
       icon: Calculator,
-      link: "/#emprunt",
+      link: "/?tab=emprunt",
       color: "primary"
     },
     {
       title: "Rentabilité Locative",
       description: "Évaluez la rentabilité de votre investissement immobilier",
       icon: TrendingUp,
-      link: "/#rentabilite",
+      link: "/?tab=rentabilite",
       color: "accent"
     },
     {
       title: "Simulation Investissement",
       description: "Simulez différents scénarios d'investissement",
       icon: Target,
-      link: "/#emprunt",
+      link: "/?tab=emprunt",
       color: "primary"
     },
     {
       title: "Intérêts Composés",
       description: "Découvrez la puissance des intérêts composés sur vos placements",
       icon: BarChart3,
-      link: "/#interets",
+      link: "/?tab=interets",
       color: "accent"
     }
   ];

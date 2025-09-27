@@ -5,6 +5,7 @@ import { useAnalytics } from "@/hooks/useAnalytics";
 import { useMobileOverlayAd } from "@/hooks/useMobileOverlayAd";
 import { ENV } from "@/config/environment";
 import { lazy, Suspense, useEffect, useState, useCallback } from "react";
+import { useSearchParams } from "react-router-dom";
 
 // Lazy loading des composants pour optimiser les performances
 const AdSpace = lazy(() => import("@/components/AdSpace"));
@@ -27,9 +28,13 @@ const MainLayout = () => {
   const isMobile = useIsMobile();
   const { refreshKey, refreshAds, shouldDisplayAd } = useAdRefresh();
   const { showOverlay, closeOverlay, trackOverlayInteraction, triggerOverlayAfterCalculation, checkSessionStorage } = useMobileOverlayAd();
+  const [searchParams] = useSearchParams();
   
-  // État pour gérer l'onglet actif
-  const [activeTab, setActiveTab] = useState("emprunt");
+  // État pour gérer l'onglet actif - initialisé avec le paramètre URL
+  const [activeTab, setActiveTab] = useState(() => {
+    const tabParam = searchParams.get('tab');
+    return tabParam || "emprunt";
+  });
   
   // Fonction pour changer l'onglet depuis PageHeader
   const handleTabChange = useCallback((tabValue: string) => {
@@ -38,6 +43,14 @@ const MainLayout = () => {
   
   // Utiliser la configuration centralisée pour Google Analytics
   const { trackCalculation } = useAnalytics(ENV.GA_MEASUREMENT_ID);
+
+  // Écouter les changements de paramètres URL
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
 
   // Vérifier le sessionStorage au montage du composant
   useEffect(() => {
