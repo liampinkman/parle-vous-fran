@@ -151,7 +151,7 @@ const Conseils = () => {
                 Utilisez nos calculateurs pour appliquer ces conseils à votre situation
               </p>
               <Link 
-                to="/"
+                to="/calculateurs"
                 className="inline-flex items-center justify-center px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-colors"
               >
                 Accéder aux calculateurs
