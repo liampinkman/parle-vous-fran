@@ -13,6 +13,7 @@ import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
 import ConditionsUtilisation from "./pages/ConditionsUtilisation";
 import PolitiqueCookies from "./pages/PolitiqueCookies";
 import NotFound from "./pages/NotFound";
+import GlobalErrorBoundary from "@/components/GlobalErrorBoundary";
 
 const queryClient = new QueryClient();
 
@@ -22,26 +23,28 @@ const App = () => {
   console.log('🎬 App component rendering...');
   
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <HashRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/calculateurs" element={<Calculateurs />} />
-            <Route path="/conseils" element={<Conseils />} />
-            <Route path="/expertise" element={<Expertise />} />
-            <Route path="/mentions-legales" element={<MentionsLegales />} />
-            <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
-            <Route path="/conditions-utilisation" element={<ConditionsUtilisation />} />
-            <Route path="/politique-cookies" element={<PolitiqueCookies />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </HashRouter>
-      </TooltipProvider>
-    </QueryClientProvider>
+    <GlobalErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <HashRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/calculateurs" element={<Calculateurs />} />
+              <Route path="/conseils" element={<Conseils />} />
+              <Route path="/expertise" element={<Expertise />} />
+              <Route path="/mentions-legales" element={<MentionsLegales />} />
+              <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
+              <Route path="/conditions-utilisation" element={<ConditionsUtilisation />} />
+              <Route path="/politique-cookies" element={<PolitiqueCookies />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </HashRouter>
+        </TooltipProvider>
+      </QueryClientProvider>
+    </GlobalErrorBoundary>
   )
 };
 
