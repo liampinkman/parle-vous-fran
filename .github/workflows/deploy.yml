@@ -51,6 +51,13 @@ jobs:
         ls -la dist/assets/ | head -10
         echo "=== Checking for main JS file ==="
         find dist -name "*main*" -o -name "*index*" | grep -E "\.(js|ts)$"
+        echo "=== Dist root listing ==="
+        ls -la dist | head -50
+        echo "=== Check CNAME and .nojekyll ==="
+        if [ -f dist/CNAME ]; then echo "CNAME found:" && cat dist/CNAME; else echo "CNAME missing"; fi
+        if [ -f dist/.nojekyll ]; then echo ".nojekyll present"; else echo ".nojekyll missing"; fi
+        echo "=== Check 404.html ==="
+        if [ -f dist/404.html ]; then echo "404.html present"; else echo "404.html missing"; fi
         
     - name: Setup Pages
       uses: actions/configure-pages@v4
