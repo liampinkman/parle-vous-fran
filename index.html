@@ -55,6 +55,29 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      (function () {
+        try {
+          var key = 'app-mount-reload';
+          setTimeout(function () {
+            if (!window.__APP_MOUNTED__) {
+              try {
+                if (!sessionStorage.getItem(key)) {
+                  sessionStorage.setItem(key, '1');
+                  var url = new URL(window.location.href);
+                  url.searchParams.set('_', String(Date.now()));
+                  window.location.replace(url.toString());
+                } else {
+                  sessionStorage.removeItem(key);
+                }
+              } catch (e) {
+                window.location.reload();
+              }
+            }
+          }, 3000);
+        } catch (e) {}
+      })();
+    </script>
     <script type="module" src="./src/main.tsx"></script>
   </body>
 </html>
