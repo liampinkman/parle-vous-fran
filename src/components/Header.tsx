@@ -11,7 +11,7 @@ const Header = () => {
         {/* Top Bar avec logo et navigation */}
         <div className="flex items-center justify-between mb-4">
           {/* Logo et nom */}
-          <div className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <div className="relative">
               <Building2 size={isMobile ? 32 : 40} className="text-accent" />
               <TrendingUp size={16} className="absolute -top-1 -right-1 text-primary-foreground" />
@@ -24,7 +24,7 @@ const Header = () => {
                 Simulation Investissement
               </p>
             </div>
-          </div>
+          </Link>
 
           {/* Navigation principale - Desktop */}
           {!isMobile && (
