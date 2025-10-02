@@ -90,9 +90,8 @@ const MainLayout = () => {
               <div className="space-y-4 md:space-y-6">
                 <Suspense fallback={<LoadingSpinner />}>
                   <AdSpace position="sidebar" refreshKey={refreshKey} />
-                  {shouldDisplayAd("sidebar") && (
-                    <AdSpace position="sidebar" refreshKey={refreshKey} />
-                  )}
+                  <AdSpace position="sidebar" refreshKey={refreshKey} />
+                  <AdSpace position="sidebar" refreshKey={refreshKey} />
                 </Suspense>
               </div>
             )}
@@ -101,6 +100,14 @@ const MainLayout = () => {
           {/* Contenu informatif en bas de page - chargé paresseusement */}
           <Suspense fallback={<LoadingSpinner />}>
             <InformationalContent />
+          </Suspense>
+
+          {/* Espaces publicitaires supplémentaires en bas */}
+          <Suspense fallback={<LoadingSpinner />}>
+            <div className="mt-6 space-y-4">
+              <AdSpace position="bottom" refreshKey={refreshKey} />
+              <AdSpace position="bottom" refreshKey={refreshKey} />
+            </div>
           </Suspense>
         </div>
       </div>
