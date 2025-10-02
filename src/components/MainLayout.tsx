@@ -1,15 +1,18 @@
-
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAdRefresh } from "@/hooks/useAdRefresh";
 import { useAnalytics } from "@/hooks/useAnalytics";
 import { useMobileOverlayAd } from "@/hooks/useMobileOverlayAd";
+import { useTabState } from "@/hooks/useTabState";
 import { ENV } from "@/config/environment";
-import { lazy, Suspense, useEffect, useState, useCallback } from "react";
-import { useSearchParams } from "react-router-dom";
+import { lazy, Suspense, useEffect } from "react";
 
-// Lazy loading des composants pour optimiser les performances
-const AdSpace = lazy(() => import("@/components/AdSpace"));
-const Header = lazy(() => import("@/components/Header"));
+// Composants critiques importés directement (pas de lazy loading)
+import Header from "@/components/Header";
+import AdSpace from "@/components/AdSpace";
+import AdColumn from "@/components/layout/AdColumn";
+import BottomAds from "@/components/layout/BottomAds";
+
+// Lazy loading uniquement pour les composants non-critiques
 const PageHeader = lazy(() => import("@/components/PageHeader"));
 const TabsContainer = lazy(() => import("@/components/TabsContainer"));
 const InformationalContent = lazy(() => import("@/components/InformationalContent"));
@@ -17,59 +20,35 @@ const Footer = lazy(() => import("@/components/Footer"));
 const CookieBanner = lazy(() => import("@/components/CookieBanner"));
 const MobileOverlayAd = lazy(() => import("@/components/MobileOverlayAd"));
 
-// Composant de chargement simple
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center p-4">
     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
   </div>
 );
 
+
 const MainLayout = () => {
   const isMobile = useIsMobile();
   const { refreshKey, refreshAds, shouldDisplayAd } = useAdRefresh();
   const { showOverlay, closeOverlay, trackOverlayInteraction, triggerOverlayAfterCalculation, checkSessionStorage } = useMobileOverlayAd();
-  const [searchParams] = useSearchParams();
-  
-  // État pour gérer l'onglet actif - initialisé avec le paramètre URL
-  const [activeTab, setActiveTab] = useState(() => {
-    const tabParam = searchParams.get('tab');
-    return tabParam || "emprunt";
-  });
-  
-  // Fonction pour changer l'onglet depuis PageHeader
-  const handleTabChange = useCallback((tabValue: string) => {
-    setActiveTab(tabValue);
-  }, []);
-  
-  // Utiliser la configuration centralisée pour Google Analytics
+  const { activeTab, setActiveTab } = useTabState();
   const { trackCalculation } = useAnalytics(ENV.GA_MEASUREMENT_ID);
 
-  // Écouter les changements de paramètres URL
-  useEffect(() => {
-    const tabParam = searchParams.get('tab');
-    if (tabParam) {
-      setActiveTab(tabParam);
-    }
-  }, [searchParams]);
-
-  // Vérifier le sessionStorage au montage du composant
   useEffect(() => {
     checkSessionStorage();
   }, [checkSessionStorage]);
 
+
   return (
     <div className="min-h-screen bg-background">
-      {/* Header principal professionnel */}
-      <Suspense fallback={<LoadingSpinner />}>
-        <Header />
-      </Suspense>
+      <Header />
 
       <div className="p-3 pb-6 md:p-6">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-4 md:gap-6">
             <div>
               <Suspense fallback={<LoadingSpinner />}>
-                <PageHeader onTabChange={handleTabChange} />
+                <PageHeader onTabChange={setActiveTab} />
                 <TabsContainer
                   activeTab={activeTab}
                   onTabChange={setActiveTab}
@@ -77,48 +56,33 @@ const MainLayout = () => {
                   trackCalculation={trackCalculation} 
                   triggerMobileOverlay={triggerOverlayAfterCalculation}
                 />
-
-                {/* Publicité en bas uniquement si l'utilisateur n'est pas sur mobile ou si shouldDisplayAd retourne true */}
-                {(!isMobile || shouldDisplayAd("bottom")) && (
-                  <AdSpace position="bottom" refreshKey={refreshKey} />
-                )}
               </Suspense>
+
+              {(!isMobile || shouldDisplayAd("bottom")) && (
+                <AdSpace position="bottom" refreshKey={refreshKey} />
+              )}
             </div>
 
-            {/* Sidebar avec publicités uniquement si l'utilisateur n'est pas sur mobile */}
-            {!isMobile && (
-              <div className="space-y-4 md:space-y-6">
-                <Suspense fallback={<LoadingSpinner />}>
-                  <AdSpace position="sidebar" refreshKey={refreshKey} />
-                  <AdSpace position="sidebar" refreshKey={refreshKey} />
-                  <AdSpace position="sidebar" refreshKey={refreshKey} />
-                </Suspense>
-              </div>
-            )}
+
+            {!isMobile && <AdColumn refreshKey={refreshKey} />}
           </div>
 
-          {/* Contenu informatif en bas de page - chargé paresseusement */}
+
           <Suspense fallback={<LoadingSpinner />}>
             <InformationalContent />
           </Suspense>
 
-          {/* Espaces publicitaires supplémentaires en bas */}
-          <Suspense fallback={<LoadingSpinner />}>
-            <div className="mt-6 space-y-4">
-              <AdSpace position="bottom" refreshKey={refreshKey} />
-              <AdSpace position="bottom" refreshKey={refreshKey} />
-            </div>
-          </Suspense>
+          <BottomAds refreshKey={refreshKey} />
         </div>
       </div>
 
-      {/* Footer et bannière cookies */}
+
       <Suspense fallback={<LoadingSpinner />}>
         <Footer />
         <CookieBanner />
       </Suspense>
 
-      {/* Overlay Ad Mobile - affiché conditionnellement */}
+
       {showOverlay && (
         <Suspense fallback={null}>
           <MobileOverlayAd 
