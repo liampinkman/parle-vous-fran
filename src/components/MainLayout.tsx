@@ -43,9 +43,9 @@ const MainLayout = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <div className="p-3 pb-6 md:p-6">
+      <div className="p-2 pb-4 md:p-6">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-4 md:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-3 md:gap-6">
             <div>
               <Suspense fallback={<LoadingSpinner />}>
                 <PageHeader onTabChange={setActiveTab} />

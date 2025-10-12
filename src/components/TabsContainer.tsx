@@ -32,20 +32,23 @@ const TabsContainer = ({ refreshAds, trackCalculation, triggerMobileOverlay, act
       <CardContent className="p-3 pt-5 md:pt-6 md:p-6">
         <Tabs defaultValue="emprunt" value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className="w-full grid sm:grid-cols-4 grid-cols-2 gap-1 mb-2">
-            <TabsTrigger value="emprunt" className="flex items-center justify-center gap-1.5">
-              <Calculator size={16} className="shrink-0" />
-              <span>Emprunt</span>
+            <TabsTrigger value="emprunt" className="flex items-center justify-center gap-1 md:gap-1.5 text-xs md:text-sm px-1 md:px-3">
+              <Calculator size={14} className="shrink-0 md:w-4 md:h-4" />
+              <span className="hidden sm:inline">Emprunt</span>
+              <span className="sm:hidden">Prêt</span>
             </TabsTrigger>
-            <TabsTrigger value="rentabilite" className="flex items-center justify-center gap-1.5">
-              <CircleDollarSign size={16} className="shrink-0" />
-              <span>Rentabilité locative</span>
+            <TabsTrigger value="rentabilite" className="flex items-center justify-center gap-1 md:gap-1.5 text-xs md:text-sm px-1 md:px-3">
+              <CircleDollarSign size={14} className="shrink-0 md:w-4 md:h-4" />
+              <span className="hidden sm:inline">Rentabilité locative</span>
+              <span className="sm:hidden">Locatif</span>
             </TabsTrigger>
-            <TabsTrigger value="interets" className="flex items-center justify-center gap-1.5">
-              <TrendingUp size={16} className="shrink-0" />
-              <span>Intérêts composés</span>
+            <TabsTrigger value="interets" className="flex items-center justify-center gap-1 md:gap-1.5 text-xs md:text-sm px-1 md:px-3">
+              <TrendingUp size={14} className="shrink-0 md:w-4 md:h-4" />
+              <span className="hidden sm:inline">Intérêts composés</span>
+              <span className="sm:hidden">Intérêts</span>
             </TabsTrigger>
-            <TabsTrigger value="faq" className="flex items-center justify-center gap-1.5">
-              <HelpCircle size={16} className="shrink-0" />
+            <TabsTrigger value="faq" className="flex items-center justify-center gap-1 md:gap-1.5 text-xs md:text-sm px-1 md:px-3">
+              <HelpCircle size={14} className="shrink-0 md:w-4 md:h-4" />
               <span>FAQ</span>
             </TabsTrigger>
           </TabsList>

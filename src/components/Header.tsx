@@ -47,26 +47,26 @@ const Header = () => {
 
         {/* Slogan principal */}
         <div className="text-center">
-          <h2 className="text-2xl md:text-4xl font-heading font-bold text-primary-foreground mb-2">
+          <h2 className="text-xl md:text-4xl font-heading font-bold text-primary-foreground mb-2">
             Calculateur d'Investissement Immobilier
           </h2>
-          <p className="text-base md:text-lg text-primary-foreground/90 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-sm md:text-lg text-primary-foreground/90 max-w-3xl mx-auto leading-relaxed">
             <span className="font-semibold text-accent">Optimisez vos investissements</span> avec nos outils professionnels. 
-            Calculez votre capacité d'emprunt, analysez la rentabilité locative et prenez des décisions éclairées.
+            {!isMobile && "Calculez votre capacité d'emprunt, analysez la rentabilité locative et prenez des décisions éclairées."}
           </p>
           
           {/* Badges de confiance */}
-          <div className="flex items-center justify-center gap-4 mt-4 text-sm text-primary-foreground/80">
+          <div className="flex items-center justify-center gap-2 md:gap-4 mt-3 md:mt-4 text-xs md:text-sm text-primary-foreground/80 flex-wrap">
             <div className="flex items-center gap-1">
-              <Shield size={16} className="text-accent" />
+              <Shield size={14} className="text-accent md:w-4 md:h-4" />
               <span>100% Gratuit</span>
             </div>
             <div className="flex items-center gap-1">
-              <TrendingUp size={16} className="text-accent" />
+              <TrendingUp size={14} className="text-accent md:w-4 md:h-4" />
               <span>Calculs Précis</span>
             </div>
             <div className="flex items-center gap-1">
-              <Building2 size={16} className="text-accent" />
+              <Building2 size={14} className="text-accent md:w-4 md:h-4" />
               <span>Données 2025</span>
             </div>
           </div>
