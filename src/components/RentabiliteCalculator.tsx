@@ -1,20 +1,12 @@
-
+import { memo } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useRentabiliteCalculator } from "@/hooks/useRentabiliteCalculator";
 import { formatMontant } from "@/utils/financialCalculators";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { memo } from "react";
-import AdSpace from "@/components/AdSpace";
-import { useIsMobile } from "@/hooks/use-mobile";
+import InformationalSection from "@/components/shared/InformationalSection";
+import { RENTABILITE_INFO } from "@/constants/informationalContent";
 
 interface RentabiliteCalculatorProps {
   prixAchat?: string;
@@ -63,23 +55,11 @@ const RentabiliteCalculator = memo((props: RentabiliteCalculatorProps) => {
   
   return (
     <div className="space-y-6 p-4">
-      <div className="bg-blue-50 p-4 rounded-lg mb-6">
-        <h3 className="text-sm font-medium mb-2 text-blue-800">Informations sur le calcul de rentabilité en France (2025)</h3>
-        <p className="text-sm text-blue-700 mb-2">
-          Ce calculateur prend en compte tous les aspects de votre investissement :
-        </p>
-        <ul className="list-disc pl-5 text-sm text-blue-700 space-y-1">
-          <li>Frais de notaire entre 7% et 8% pour l'ancien, environ 3% pour le neuf</li>
-          <li>Mensualités de crédit selon votre apport et les conditions d'emprunt</li>
-          <li>Charges annuelles : taxe foncière, charges de copropriété, assurances, etc.</li>
-          <li>Fiscalité : PFU à 30% ou régime réel d'imposition</li>
-          <li>Cash-flow mensuel réel après crédit et impôts</li>
-        </ul>
-      </div>
-
-      <div className="my-4">
-        <AdSpace position="bottom" refreshKey={Date.now()} />
-      </div>
+      <InformationalSection 
+        title={RENTABILITE_INFO.title}
+        description={RENTABILITE_INFO.description}
+        items={RENTABILITE_INFO.items}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">

@@ -1,20 +1,12 @@
-
+import { memo } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useEmpruntCalculator } from "@/hooks/useEmpruntCalculator";
 import { formatMontant } from "@/utils/financialCalculators";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { memo } from "react";
-import AdSpace from "@/components/AdSpace";
-import { useIsMobile } from "@/hooks/use-mobile";
+import InformationalSection from "@/components/shared/InformationalSection";
+import { EMPRUNT_INFO } from "@/constants/informationalContent";
 
 interface EmpruntCalculatorProps {
   revenuMensuel?: string;
@@ -51,23 +43,11 @@ const EmpruntCalculator = memo((props: EmpruntCalculatorProps) => {
 
   return (
     <div className="space-y-6 p-4">
-      <div className="bg-blue-50 p-4 rounded-lg mb-6">
-        <h3 className="text-sm font-medium mb-2 text-blue-800">Informations sur le calcul de capacité d'emprunt en France (2025)</h3>
-        <p className="text-sm text-blue-700 mb-2">
-          Ce calculateur prend en compte les critères suivants selon les normes françaises actuelles :
-        </p>
-        <ul className="list-disc pl-5 text-sm text-blue-700 space-y-1">
-          <li>Taux d'endettement maximal de 35% des revenus nets (norme HCSF 2021)</li>
-          <li>Durée maximale d'emprunt généralement limitée à 25 ans</li>
-          <li>Revenus nets mensuels après impôt</li>
-          <li>Charges mensuelles incluant les crédits en cours</li>
-          <li>Taux d'intérêt moyen en 2025 (à ajuster selon les offres bancaires actuelles)</li>
-        </ul>
-      </div>
-
-      <div className="my-4">
-        <AdSpace position="bottom" refreshKey={Date.now()} />
-      </div>
+      <InformationalSection 
+        title={EMPRUNT_INFO.title}
+        description={EMPRUNT_INFO.description}
+        items={EMPRUNT_INFO.items}
+      />
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">

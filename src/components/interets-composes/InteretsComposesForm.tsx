@@ -1,11 +1,10 @@
-
+import { memo } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Calculator, ChartLine } from "lucide-react";
-import { memo } from "react";
-import AdSpace from "@/components/AdSpace";
-import { useIsMobile } from "@/hooks/use-mobile";
+import InformationalSection from "@/components/shared/InformationalSection";
+import { INTERETS_COMPOSES_INFO } from "@/constants/informationalContent";
 
 interface InteretsComposesFormProps {
   montantInitial: string;
@@ -32,26 +31,12 @@ const InteretsComposesForm = memo(({
 }: InteretsComposesFormProps) => {
   return (
     <>
-      <div className="financial-info-box">
-        <h3 className="text-sm font-medium mb-2 text-primary flex items-center gap-2">
-          <ChartLine size={18} />
-          Informations sur les intérêts composés (2025)
-        </h3>
-        <p className="text-sm text-gray-700 mb-2">
-          Ce calculateur illustre la puissance des intérêts composés dans l'investissement boursier:
-        </p>
-        <ul className="list-disc pl-5 text-sm text-gray-700 space-y-1">
-          <li>Les rendements sont calculés avec réinvestissement automatique des gains</li>
-          <li>Le taux moyen historique du CAC 40 est d'environ 7% par an sur le long terme</li>
-          <li>Les versements réguliers amplifient considérablement l'effet des intérêts composés</li>
-          <li>Les calculs ne tiennent pas compte de l'inflation ni de la fiscalité (PFU à 30% ou barème progressif)</li>
-          <li>Diversification et temps sont les clés du succès en investissement boursier</li>
-        </ul>
-      </div>
-
-      <div className="my-4">
-        <AdSpace position="bottom" refreshKey={Date.now()} />
-      </div>
+      <InformationalSection 
+        title={INTERETS_COMPOSES_INFO.title}
+        description={INTERETS_COMPOSES_INFO.description}
+        items={INTERETS_COMPOSES_INFO.items}
+        icon={ChartLine}
+      />
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
