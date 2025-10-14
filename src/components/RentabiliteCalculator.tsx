@@ -77,11 +77,9 @@ const RentabiliteCalculator = memo((props: RentabiliteCalculatorProps) => {
         </ul>
       </div>
 
-      {!useIsMobile() && (
-        <div className="my-4">
-          <AdSpace position="bottom" refreshKey={Date.now()} />
-        </div>
-      )}
+      <div className="my-4">
+        <AdSpace position="bottom" refreshKey={Date.now()} />
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
