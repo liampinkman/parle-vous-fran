@@ -13,6 +13,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { memo } from "react";
+import AdSpace from "@/components/AdSpace";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface EmpruntCalculatorProps {
   revenuMensuel?: string;
@@ -62,6 +64,12 @@ const EmpruntCalculator = memo((props: EmpruntCalculatorProps) => {
           <li>Taux d'intérêt moyen en 2025 (à ajuster selon les offres bancaires actuelles)</li>
         </ul>
       </div>
+
+      {!useIsMobile() && (
+        <div className="my-4">
+          <AdSpace position="bottom" refreshKey={Date.now()} />
+        </div>
+      )}
       
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
