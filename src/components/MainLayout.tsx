@@ -72,6 +72,12 @@ const MainLayout = () => {
             <InformationalContent />
           </Suspense>
 
+          {isMobile && (
+            <div className="mt-4">
+              <AdSpace position="bottom" refreshKey={refreshKey} />
+            </div>
+          )}
+
           <BottomAds refreshKey={refreshKey} />
         </div>
       </div>
